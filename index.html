@@ -1,0 +1,1522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Indoor Sensitivity Analysis — Pure Coast Holdings</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --panel: #ffffff;
+    --border: #dde3e9;
+    --text: #16212b;
+    --muted: #5b6b78;
+    --accent: #2e5496;
+    --accent-soft: #e8eefb;
+    --good: #1e7d3c;
+    --warn: #b3541e;
+    --bad: #b3261e;
+    --series-2: #1baf7a;
+    --shadow: 0 1px 3px rgba(20,30,40,.08), 0 1px 2px rgba(20,30,40,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10151a;
+      --panel: #1a2129;
+      --border: #2b3540;
+      --text: #e8edf2;
+      --muted: #93a3b0;
+      --accent: #6d93d6;
+      --accent-soft: #1e2c42;
+      --good: #4fbf72;
+      --warn: #e0a458;
+      --bad: #e2685f;
+      --series-2: #199e70;
+      --shadow: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151a; --panel: #1a2129; --border: #2b3540; --text: #e8edf2;
+    --muted: #93a3b0; --accent: #6d93d6; --accent-soft: #1e2c42;
+    --good: #4fbf72; --warn: #e0a458; --bad: #e2685f; --series-2: #199e70;
+    --shadow: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.3);
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f6f8; --panel: #ffffff; --border: #dde3e9; --text: #16212b;
+    --muted: #5b6b78; --accent: #2e5496; --accent-soft: #e8eefb;
+    --good: #1e7d3c; --warn: #b3541e; --bad: #b3261e; --series-2: #1baf7a;
+    --shadow: 0 1px 3px rgba(20,30,40,.08), 0 1px 2px rgba(20,30,40,.06);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; }
+  header h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  header p.sub { color: var(--muted); margin: 0 0 4px; max-width: 78ch; }
+  header p.scope { color: var(--muted); margin: 0 0 24px; font-size: .88rem; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+    margin-bottom: 22px;
+  }
+  .panel h2 {
+    font-size: 1.02rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel h2 .n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: .72rem; font-weight: 700;
+  }
+  .panel > p.hint { color: var(--muted); font-size: .84rem; margin: 0 0 16px; }
+
+  /* Sliders */
+  .sliders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px 28px;
+  }
+  .slider-row label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: .86rem; font-weight: 600; margin-bottom: 4px;
+  }
+  .slider-row label .val {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .slider-row input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    height: 20px;
+  }
+  .slider-row .sub-readout {
+    display: flex; justify-content: space-between;
+    font-size: .76rem; color: var(--muted); margin-top: 2px;
+  }
+  .slider-row .flag {
+    font-size: .72rem; color: var(--warn); margin-top: 2px;
+  }
+
+  /* Headline */
+  .headline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 760px) { .headline-grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card .label { font-size: .78rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+  .card .value { font-size: 1.9rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .card.hero .value { font-size: 2.5rem; }
+  .card .value.good { color: var(--good); }
+  .card .value.bad { color: var(--bad); }
+  .card .card-note { font-size: .74rem; color: var(--muted); margin-top: 6px; font-weight: 400; }
+
+  /* Breakdown */
+  .bd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .bd-block h3 {
+    font-size: .82rem; text-transform: uppercase; letter-spacing: .03em;
+    color: var(--muted); margin: 0 0 8px; font-weight: 700;
+  }
+  .bd-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 5px 0; border-bottom: 1px dashed var(--border);
+    font-size: .89rem;
+  }
+  .bd-row:last-child { border-bottom: none; }
+  .bd-row .k { color: var(--muted); }
+  .bd-row .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .bd-row.total .v, .bd-row.total .k { font-weight: 800; color: var(--text); }
+  .bd-row .v .v-sub { font-weight: 400; color: var(--muted); margin-left: 4px; }
+
+  /* Additional inputs */
+  .inputs-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+  .inputs-group h3 {
+    font-size: .84rem; text-transform: uppercase; letter-spacing: .03em;
+    color: var(--accent); margin: 0 0 10px; font-weight: 700;
+  }
+  .field-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border);
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-row label { font-size: .84rem; flex: 1; }
+  .field-row .field-note { display: block; font-size: .72rem; color: var(--muted); font-weight: 400; }
+
+  /* Summary callout */
+  .summary-panel {
+    border: 1px solid var(--warn);
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+  }
+  .summary-panel h2 { font-size: .95rem; margin: 0 0 10px; color: var(--warn); text-transform: uppercase; letter-spacing: .03em; }
+  .summary-panel ol { margin: 0; padding-left: 22px; }
+  .summary-panel li { margin-bottom: 8px; font-size: .88rem; }
+  .summary-panel li:last-child { margin-bottom: 0; }
+  .summary-panel .takeaway { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: .88rem; }
+
+  /* Sticky profit/breakeven bar */
+  .sticky-summary {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    align-items: baseline;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .sticky-summary-item { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  .sticky-summary-item .sticky-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+  .sticky-summary-item .sticky-value { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .sticky-summary-item .sticky-value.good { color: var(--good); }
+  .sticky-summary-item .sticky-value.bad { color: var(--bad); }
+  .sticky-divider { color: var(--border); font-weight: 700; font-size: 1.1rem; margin-left: auto; padding: 0 2px; }
+  .field-row input[type=number] {
+    width: 118px; padding: 5px 8px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font-size: .86rem; text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .badge-placeholder {
+    display: inline-block; font-size: .66rem; font-weight: 700;
+    color: var(--warn); border: 1px solid var(--warn); border-radius: 4px;
+    padding: 0 4px; margin-left: 6px; vertical-align: middle;
+  }
+
+  /* Radio groups (holiday mode, financing bucket treatment) */
+  .radio-row { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0; }
+  .radio-row label { display: flex; align-items: center; gap: 5px; font-size: .84rem; font-weight: 400; flex: none; }
+  .radio-row input[type=radio] { accent-color: var(--accent); }
+
+  /* Production ramp stage table */
+  .ramp-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: 10px 0; }
+  .ramp-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .02em; padding: 4px 8px 6px; border-bottom: 1px solid var(--border); }
+  .ramp-table td { padding: 6px 8px; border-bottom: 1px dashed var(--border); }
+  .ramp-table input[type=number] {
+    width: 80px; padding: 4px 6px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font-size: .84rem; text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .ramp-table .readout { color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #ramp-controls.ramp-disabled input { opacity: .45; }
+  .ramp-toggle-row { justify-content: flex-start; gap: 10px; }
+  .ramp-toggle-row label { flex: none; font-size: .92rem; font-weight: 700; cursor: pointer; }
+  .ramp-toggle-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+
+  /* P/L over time chart */
+  .chart-controls {
+    background: var(--accent-soft); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  .chart-controls .radio-row { margin-top: 8px; }
+  .chart-wrap { position: relative; }
+  .chart-card { margin-bottom: 10px; }
+  .chart-card .chart-title { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px; }
+  .chart-svg { display: block; width: 100%; height: auto; }
+  .chart-gridline { stroke: var(--border); stroke-width: 1; }
+  .chart-zeroline { stroke: var(--muted); stroke-width: 1; }
+  .chart-axis-label { fill: var(--muted); font-size: 9px; font-family: inherit; }
+  .chart-annotation-bracket { stroke: var(--warn); stroke-width: 1.5; fill: none; }
+  .chart-annotation-label { fill: var(--warn); font-size: 8.5px; font-family: inherit; font-weight: 600; }
+  .chart-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart-endlabel { font-size: 10px; font-weight: 700; font-family: inherit; }
+  .chart-crosshair {
+    position: absolute; top: 0; bottom: 0; width: 1px; background: var(--muted);
+    pointer-events: none; display: none;
+  }
+  .chart-tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+    box-shadow: var(--shadow); padding: 8px 10px; font-size: .78rem; white-space: nowrap;
+    z-index: 5;
+  }
+  .chart-tooltip .tt-month { color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .chart-tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; }
+  .chart-tooltip .tt-row .tt-label { color: var(--muted); }
+  .chart-tooltip .tt-row .tt-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chart-tooltip .tt-key { display: inline-block; width: 10px; height: 2px; margin-right: 5px; vertical-align: middle; }
+
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  .schedule-table th, .schedule-table td { padding: 4px 10px; text-align: right; border-bottom: 1px dashed var(--border); white-space: nowrap; }
+  .schedule-table th:first-child, .schedule-table td:first-child { text-align: left; }
+  .schedule-table th { color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; position: sticky; top: 0; background: var(--panel); }
+  .schedule-table tbody tr:last-child td { font-weight: 700; border-bottom: none; }
+
+  footer { color: var(--muted); font-size: .78rem; margin-top: 30px; max-width: 90ch; }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="sticky-summary" id="sticky-summary">
+  <div class="sticky-summary-item">
+    <span class="sticky-label">Steady-State P/L</span>
+    <span class="sticky-value" id="sticky-profitAfterDS">—</span>
+  </div>
+  <div class="sticky-summary-item">
+    <span class="sticky-label">Breakeven Sale Price</span>
+    <span class="sticky-value" id="sticky-breakevenPrice">—</span>
+  </div>
+  <div class="sticky-divider" aria-hidden="true">||</div>
+  <div class="sticky-summary-item">
+    <span class="sticky-label">Year 1 P/L</span>
+    <span class="sticky-value" id="sticky-year1PL">—</span>
+  </div>
+</div>
+
+<header>
+  <h1>Indoor Sensitivity Analysis</h1>
+  <p class="sub">Pure Coast Holdings — 12504 S 42nd St, Fulton Township / Vicksburg, MI. Explore
+    partial LED + standalone HVAC build-outs against a 3-tier financing structure.</p>
+  <p class="scope">Indoor only — outdoor expansion (Tranche 3) is not modeled here. Exploratory
+    what-if tool, not the bank deliverable (<code>Fulton_Bank_Proposalv2.xlsx</code> is the
+    live deliverable). Defaults are traceable to that workbook where noted; placeholder
+    estimates are flagged.</p>
+</header>
+
+<section class="summary-panel">
+  <h2>What actually moves the P/L (ranked, at current defaults)</h2>
+  <ol>
+    <li><b>Tier 3 — OpEx financing terms.</b> The single biggest swing in this whole model,
+      bigger than yield or price. Doubling "months of OpEx financed" from 3 → 6 moves profit
+      by <b>&minus;$428K</b>; stretching the 1-year OpEx loan term to 3–5 years moves it
+      <b>+$256K to +$306K</b>. This tier's rate (20%) and 1-year term are stated placeholders
+      (see Additional Inputs) — right now they matter more to the headline number than the
+      actual grow economics do.</li>
+    <li><b>Whether the improvement happens at all.</b> Improved sq ft 0 → 10,800 swings profit
+      by roughly <b>&minus;$746K</b>. This is the core investment decision the tool exists to
+      explore, not a hidden risk — but it's still the largest single lever.</li>
+    <li><b>Improved-space yield rate.</b> A ±5 g/sqft/cycle move (e.g. 40 → 45) swings profit
+      by about <b>±$262K</b> — this is the "real" production upside/downside.</li>
+    <li><b>Sale price.</b> A ±$50/lb move swings profit by about <b>±$220K</b> — comparable in
+      size to the yield lever, as expected since both scale revenue directly.</li>
+    <li><b>Tier 2 — Equipment loan term.</b> Shortening from 7 to 3 years costs about
+      <b>&minus;$166K</b>; the rate matters less (±$30–65K across a 10-point rate swing).</li>
+    <li><b>Base OpEx line items</b> (payroll, overhead, contingency %). A 10% change in any one
+      is worth roughly <b>$30K–$86K</b> — real, but an order of magnitude smaller than the
+      financing-tier and production levers above.</li>
+    <li><b>Tier 1 — Mortgage rate/amortization.</b> The smallest lever here, <b>±$15K–$55K</b>
+      across realistic ranges — it doesn't scale with the improvement decision the way the
+      other two financing tiers do.</li>
+  </ol>
+  <div class="takeaway"><b>Bottom line:</b> before trusting any "Profit After All Debt Service"
+    number out of this tool, check the Tier 3 OpEx financing inputs first. They're the least
+    grounded assumptions in the model (pure placeholders, no vendor quote or lender term sheet
+    behind them) and currently have more influence over the headline than the production
+    assumptions (yield, price) this tool was actually built to stress-test.</div>
+</section>
+
+<section class="panel">
+  <h2><span class="n">1</span>Key Levers</h2>
+  <p class="hint">Improved and unimproved square footage always sum to the facility's fixed
+    10,800 sq ft net canopy. HVAC/LED scale continuously with improved sq ft.</p>
+  <div class="sliders-grid">
+
+    <div class="slider-row">
+      <label>Improved sq ft <span class="val" id="v-improvedSqFt"></span></label>
+      <input type="range" id="improvedSqFt" min="0" max="10800" step="100" value="10800">
+      <div class="sub-readout"><span>Unimproved: <b id="v-unimprovedSqFt"></b></span><span>Total: 10,800 sq ft (fixed)</span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Improved growth rate <span class="val" id="v-improvedGrowth"></span></label>
+      <input type="range" id="improvedGrowth" min="20" max="70" step="1" value="40">
+      <div class="sub-readout"><span>g / sq ft / cycle</span><span>v2.xlsx default: 40</span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Unimproved growth rate <span class="val" id="v-unimprovedGrowth"></span></label>
+      <input type="range" id="unimprovedGrowth" min="5" max="30" step="0.5" value="15">
+      <div class="sub-readout"><span>g / sq ft / cycle</span><span>~1.5 lb/light per harvest (60 HPS, 2,700 sqft)</span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Sale price <span class="val" id="v-pricePerLb"></span></label>
+      <input type="range" id="pricePerLb" min="200" max="800" step="5" value="475.69">
+      <div class="sub-readout"><span>$ / lb dry</span><span>v2.xlsx default: $475.69</span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Mortgage (property) price <span class="val" id="v-mortgagePrice"></span></label>
+      <input type="range" id="mortgagePrice" min="500000" max="3000000" step="50000" value="1800000">
+      <div class="sub-readout"><span>v2.xlsx default: $1,800,000</span><span></span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Tier 1 — Mortgage rate <span class="val" id="v-mortgageRate"></span></label>
+      <input type="range" id="mortgageRate" min="4" max="12" step="0.25" value="8.5">
+      <div class="flag">v2.xlsx currently ships at 7.00% — 8.5% is this tool's own default</div>
+    </div>
+
+    <div class="slider-row">
+      <label>Mortgage payment holiday <span class="val" id="v-holidayMonths"></span></label>
+      <input type="range" id="holidayMonths" min="0" max="12" step="1" value="10">
+      <div class="sub-readout"><span>months, 0–12</span><span>covers the proposal's 0–10 month ask</span></div>
+      <div class="radio-row" role="radiogroup" aria-label="Holiday mode">
+        <label><input type="radio" name="holidayMode" value="capitalize" checked> Capitalize (default)</label>
+        <label><input type="radio" name="holidayMode" value="interestOnly"> Interest-only</label>
+        <label><input type="radio" name="holidayMode" value="simple"> Simple (no accrual)</label>
+      </div>
+      <div class="flag">Simple mode: payment stops with <b>no interest accrual</b> — lender-generous,
+        not a standard forbearance.</div>
+      <div class="sub-readout"><span>In Simple/Interest-Only modes the holiday changes only the
+        balloon, not the annual payment.</span><span></span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Tier 2 — Equipment rate <span class="val" id="v-equipRate"></span></label>
+      <input type="range" id="equipRate" min="5" max="25" step="0.5" value="15">
+      <div class="sub-readout"><span>Finances LED + HVAC capex</span><span></span></div>
+    </div>
+
+    <div class="slider-row">
+      <label>Tier 3 — OpEx rate <span class="val" id="v-opexRate"></span></label>
+      <input type="range" id="opexRate" min="5" max="30" step="0.5" value="20">
+      <div class="sub-readout"><span>Finances months-of-OpEx (below)</span><span></span></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="n">2</span>Financing Structure</h2>
+  <p class="hint">Buildout capex splits into two independently-financeable buckets, matching the
+    draft Dart Bank term sheet — not a single 3-way toggle.</p>
+  <div class="inputs-groups">
+
+    <div class="inputs-group">
+      <h3>Bucket A — Permanent Improvements
+        <span class="field-note">Structural HVAC + electrical/plumbing/structural infra; the Dart
+          Bank term sheet states a single $350K lump for all of it combined, not broken out by
+          component</span></h3>
+      <div class="field-row">
+        <label>Treatment</label>
+        <div class="radio-row" role="radiogroup" aria-label="Permanent improvements financing">
+          <label><input type="radio" name="permFinancing" value="mortgage" checked> Fold into Tier 1 mortgage</label>
+          <label><input type="radio" name="permFinancing" value="tier2"> Separate Tier 2 loan</label>
+          <label><input type="radio" name="permFinancing" value="bank"> Bank pays outright</label>
+        </div>
+      </div>
+      <div class="field-row"><label>Other permanent infra ($)<span class="field-note">electrical/
+        plumbing/structural, everything except HVAC below <span class="badge-placeholder">EST</span> —
+        defaulted to <b>$0</b>, no reliable estimate exists yet. (A prior $250K default was
+        back-solved as $350K minus an assumed $100K HVAC cost — but that $100K was
+        <b>per greenhouse</b>, not facility-wide across all 4, so the subtraction was wrong on top
+        of not matching the tool's own HVAC formula. Removed rather than fixed with another guess
+        — enter a real number here once one exists.)</span></label>
+        <input type="number" id="permInfraOther" value="0" step="10000"></div>
+      <div class="field-row"><label>Override HVAC capex with a fixed $ amount<span class="field-note">skips
+        the tonnage/rate formula (Additional Inputs → HVAC Assumptions) entirely for equipment+install capex;
+        use if you have a real all-in quote for the actual greenhouses. Energy use still applies — a fixed
+        buildout quote doesn't tell you the annual electricity draw</span></label>
+        <input type="checkbox" id="hvacCapexOverrideEnabled"></div>
+      <div class="field-row"><label>Fixed HVAC capex ($, all-in equipment + install)</label>
+        <input type="number" id="hvacCapexOverrideAmount" value="0" step="10000"></div>
+      <div class="bd-row total"><span class="k">Bucket A total (HVAC + other, this tier's financed amount)</span><span class="v" id="fs-bucketATotal"></span></div>
+    </div>
+
+    <div class="inputs-group">
+      <h3>Bucket B — Portable Equipment
+        <span class="field-note">Private-backer/UCC-1 furnished; itemized list totals $135,200 — the
+          term sheet's own round-number placeholder for this tranche is $350K, kept here as the more
+          precise, later itemized figure (confirm before relying on either for a bank conversation)</span></h3>
+      <div class="field-row">
+        <label>Treatment</label>
+        <div class="radio-row" role="radiogroup" aria-label="Portable equipment financing">
+          <label><input type="radio" name="portFinancing" value="private" checked> Private cash injection (equity)</label>
+          <label><input type="radio" name="portFinancing" value="tier2"> Separate Tier 2 loan</label>
+        </div>
+      </div>
+      <div class="field-row"><label>Non-LED buyer-furnished gear ($)<span class="field-note">RadSource
+        $65K + trimmers $12.5K + SteriMist $9.2K + washer $4.5K; with LED capex ⇒ Bucket B ≈ $135,200</span></label>
+        <input type="number" id="buyerEquipOther" value="91200" step="1000"></div>
+      <div class="bd-row total"><span class="k">Bucket B total (LED + other, this tier's financed amount)</span><span class="v" id="fs-bucketBTotal"></span></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="n">3</span>Production Ramp</h2>
+  <p class="hint">Applies only to <b>improved-space</b> production — unimproved space is steady
+    from month 1. All fields below carry the <span class="badge-placeholder">EST</span> badge
+    (placeholder values, not sourced).</p>
+  <div class="field-row ramp-toggle-row">
+    <input type="checkbox" id="rampEnabled" checked>
+    <label for="rampEnabled">Enable production ramp</label>
+  </div>
+  <div id="ramp-controls">
+    <table class="ramp-table">
+      <thead>
+        <tr><th>Stage</th><th>Months</th><th>Months after Takeover</th><th>% of improved-growth slider</th><th>→ g/sqft/cycle</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><input type="number" id="rampStage1Months" value="3" step="1" min="0"></td>
+          <td class="readout" id="mr-rampStage1"></td>
+          <td><input type="number" id="rampStage1Pct" value="0" step="5" min="0" max="100"></td>
+          <td class="readout" id="rr-rampStage1"></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><input type="number" id="rampStage2Months" value="2" step="1" min="0"></td>
+          <td class="readout" id="mr-rampStage2"></td>
+          <td><input type="number" id="rampStage2Pct" value="50" step="5" min="0" max="100"></td>
+          <td class="readout" id="rr-rampStage2"></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><input type="number" id="rampStage3Months" value="4" step="1" min="0"></td>
+          <td class="readout" id="mr-rampStage3"></td>
+          <td><input type="number" id="rampStage3Pct" value="75" step="5" min="0" max="100"></td>
+          <td class="readout" id="rr-rampStage3"></td>
+        </tr>
+        <tr>
+          <td>4 (terminal)</td>
+          <td>—</td>
+          <td class="readout" id="mr-rampStage4"></td>
+          <td><input type="number" id="rampStage4Pct" value="100" step="5" min="0" max="100"></td>
+          <td class="readout" id="rr-rampStage4"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="field-row"><label>Labor cost during ramp (% of full payroll)</label>
+      <input type="number" id="rampLaborPct" value="50" step="5"></div>
+    <div class="field-row"><label>Chart tail (steady-state months shown after ramp completes)</label>
+      <input type="number" id="chartTailMonths" value="6" step="1"></div>
+  </div>
+  <div class="flag">Defaults assume a winter/shoulder takeover (lights-first productivity beats
+    unimproved even before the chiller lands). A peak-summer takeover is HVAC-limited — lower
+    the early stages. Ref: ±$200K seasonality swing.</div>
+</section>
+
+<section class="panel">
+  <h2><span class="n">4</span>Results</h2>
+  <div class="headline-grid">
+    <div class="card hero">
+      <div class="label">Steady-State P/L (Post-Ramp)</div>
+      <div class="value" id="out-profitAfterDS">—</div>
+      <div class="card-note">Full run-rate — as if fully ramped and 100% staffed from day one</div>
+    </div>
+    <div class="card hero">
+      <div class="label">Year 1 P/L</div>
+      <div class="value" id="out-year1PL">—</div>
+      <div class="card-note">Actual first 12 months — reflects the production ramp, ramp-period
+        labor %, and mortgage holiday together</div>
+    </div>
+    <div class="card hero">
+      <div class="label">Breakeven Sale Price</div>
+      <div class="value" id="out-breakevenPrice">—</div>
+      <div class="card-note">$/lb where steady-state profit after all debt service = $0, holding
+        every other input fixed</div>
+    </div>
+    <div class="card">
+      <div class="label">Cost per lb (OpEx)</div>
+      <div class="value" id="out-costPerLbOpex">—</div>
+    </div>
+    <div class="card">
+      <div class="label">Cost per lb (OpEx + Financing)</div>
+      <div class="value" id="out-costPerLbFinanced">—</div>
+    </div>
+  </div>
+  <p class="hint" style="margin-top: 14px;">Steady-State P/L is the full run-rate (post-ramp,
+    stabilized) and does not move with the ramp/holiday sliders. Year 1 P/L is the actual first-
+    year figure and does. See P/L Over Time below for the full month-by-month path.</p>
+</section>
+
+<section class="panel">
+  <h2><span class="n">5</span>P/L Over Time</h2>
+  <p class="hint">Monthly path from close through ramp-up plus <span id="v-chartTailMonths"></span>
+    steady-state months. The Tier 1 balloon (month <span id="v-balloonMonth"></span>) is off this
+    short chart — see the callout and full table below.</p>
+
+  <div class="chart-controls">
+    <div class="slider-row">
+      <label>Mortgage payment holiday <span class="val" id="v-holidayMonths2"></span></label>
+      <input type="range" id="holidayMonths2" min="0" max="12" step="1" value="10">
+    </div>
+    <div class="radio-row" role="radiogroup" aria-label="Holiday mode (chart controls)">
+      <label><input type="radio" name="holidayMode2" value="capitalize" checked> Capitalize</label>
+      <label><input type="radio" name="holidayMode2" value="interestOnly"> Interest-only</label>
+      <label><input type="radio" name="holidayMode2" value="simple"> Simple (no accrual)</label>
+    </div>
+    <div class="sub-readout"><span>Mirrors the Section 1 holiday control — adjust here or there,
+      both stay in sync</span><span></span></div>
+  </div>
+
+  <div id="chart-container" style="overflow-x:auto;"></div>
+  <div id="chart-tiles" class="headline-grid" style="margin-top: 14px;"></div>
+  <div id="balloon-annotation" class="flag" style="margin-top: 10px;"></div>
+  <details style="margin-top: 14px;">
+    <summary style="cursor:pointer; font-size: .84rem; color: var(--muted);">Full 60-month schedule</summary>
+    <div id="schedule-table-container" style="overflow-x:auto; margin-top: 10px;"></div>
+  </details>
+</section>
+
+<section class="panel">
+  <h2><span class="n">6</span>Breakdown</h2>
+  <div class="bd-grid">
+
+    <div class="bd-block">
+      <h3>Production &amp; P&amp;L</h3>
+      <div class="bd-row"><span class="k">Production (lbs/yr)</span><span class="v" id="bd-lbsPerYear"></span></div>
+      <div class="bd-row"><span class="k">Revenue</span><span class="v" id="bd-revenue"></span></div>
+      <div class="bd-row"><span class="k">Total OpEx</span><span class="v" id="bd-totalOpex"></span></div>
+      <div class="bd-row total"><span class="k">NOI</span><span class="v" id="bd-noi"></span></div>
+      <div class="bd-row"><span class="k">Operating margin</span><span class="v" id="bd-margin"></span></div>
+    </div>
+
+    <div class="bd-block">
+      <h3>OpEx Detail</h3>
+      <div class="bd-row"><span class="k">Payroll</span><span class="v" id="bd-payroll"></span></div>
+      <div class="bd-row"><span class="k">Nutrients / IPM / testing</span><span class="v" id="bd-nutrients"></span></div>
+      <div class="bd-row"><span class="k">Overhead</span><span class="v" id="bd-overhead"></span></div>
+      <div class="bd-row"><span class="k">Lighting electricity</span><span class="v" id="bd-lightingOpex"></span></div>
+      <div class="bd-row"><span class="k">HVAC electricity</span><span class="v" id="bd-hvacOpex"></span></div>
+      <div class="bd-row"><span class="k">Sales commission</span><span class="v" id="bd-commission"></span></div>
+      <div class="bd-row"><span class="k">Contingency</span><span class="v" id="bd-contingency"></span></div>
+    </div>
+
+    <div class="bd-block">
+      <h3 id="bd-capex-heading">Capex &amp; Buildout Financing</h3>
+      <div class="bd-row"><span class="k">Tons of HVAC needed</span><span class="v" id="bd-tonsNeeded"></span></div>
+      <div class="bd-row"><span class="k">LED capex</span><span class="v" id="bd-ledCapex"></span></div>
+      <div class="bd-row"><span class="k">HVAC equipment capex</span><span class="v" id="bd-hvacEquipCapex"></span></div>
+      <div class="bd-row"><span class="k">HVAC install capex</span><span class="v" id="bd-hvacInstallCapex"></span></div>
+      <div class="bd-row"><span class="k" id="bd-capexPermanent-label"></span><span class="v" id="bd-capexPermanent"></span></div>
+      <div class="bd-row"><span class="k" id="bd-capexPortable-label"></span><span class="v" id="bd-capexPortable"></span></div>
+      <div class="bd-row total"><span class="k">Total financed via Tier 2</span><span class="v" id="bd-principal2"></span></div>
+    </div>
+
+    <div class="bd-block">
+      <h3>Financing (3 tiers)</h3>
+      <div class="bd-row"><span class="k">Tier 1 · Mortgage debt service</span><span class="v" id="bd-ds1"></span></div>
+      <div class="bd-row"><span class="k">Tier 1 · Balloon at maturity</span><span class="v" id="bd-balloon1"></span></div>
+      <div class="bd-row"><span class="k">Tier 2 · Equipment debt service</span><span class="v" id="bd-ds2"></span></div>
+      <div class="bd-row"><span class="k">Tier 3 · OpEx principal financed</span><span class="v" id="bd-principal3"></span></div>
+      <div class="bd-row"><span class="k">Tier 3 · OpEx debt service</span><span class="v" id="bd-ds3"></span></div>
+      <div class="bd-row total"><span class="k">Total annual debt service</span><span class="v" id="bd-totalDS"></span></div>
+      <div class="bd-row"><span class="k">DSCR (NOI ÷ total debt service)</span><span class="v" id="bd-dscr"></span></div>
+      <div class="bd-row"><span class="k">Private equity injected (Bucket B, UCC-1)</span><span class="v" id="bd-equityInjected"></span></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel">
+  <h2><span class="n">7</span>Additional Inputs</h2>
+  <p class="hint">Everything below is editable but not on a slider. Fields marked
+    <span class="badge-placeholder">EST</span> are estimates with no source in either
+    workbook — adjust freely.</p>
+  <div class="inputs-groups">
+
+    <div class="inputs-group">
+      <h3>Production &amp; Pricing</h3>
+      <div class="field-row"><label>Cycles / year</label><input type="number" id="cyclesPerYear" value="5" step="1"></div>
+      <div class="field-row"><label>Sales commission (%)</label><input type="number" id="commissionPct" value="5" step="0.5"></div>
+      <div class="field-row"><label>Contingency (%)</label><input type="number" id="contingencyPct" value="15" step="0.5"></div>
+    </div>
+
+    <div class="inputs-group">
+      <h3>Base Indoor OpEx</h3>
+      <div class="field-row"><label>Payroll ($/yr)</label><input type="number" id="payroll" value="200000" step="1000"></div>
+      <div class="field-row"><label>Nutrients / IPM / CO2 / testing ($/yr)</label><input type="number" id="nutrients" value="126998" step="1000"></div>
+      <div class="field-row"><label>Overhead ($/yr)</label><input type="number" id="overhead" value="219186" step="1000"></div>
+    </div>
+
+    <div class="inputs-group">
+      <h3>Lighting Assumptions</h3>
+      <div class="field-row"><label>Bay size (sq ft per HVAC/LED unit)</label><input type="number" id="baySqFt" value="2800" step="100"></div>
+      <div class="field-row"><label>Existing HPS fixtures / bay</label><input type="number" id="hpsFixturesPerBay" value="60" step="1"></div>
+      <div class="field-row"><label>HPS watts / fixture</label><input type="number" id="hpsWattsPerFixture" value="1000" step="10"></div>
+      <div class="field-row"><label>Added LED fixtures / bay</label><input type="number" id="ledFixturesPerBay" value="110" step="1"></div>
+      <div class="field-row"><label>LED watts / fixture</label><input type="number" id="ledWattsPerFixture" value="645" step="5"></div>
+      <div class="field-row"><label>LED cost / fixture (purchase + install) ($)</label><input type="number" id="ledCostPerFixture" value="300" step="10"></div>
+      <div class="field-row"><label>Electricity rate ($/kWh)</label><input type="number" id="electricityRate" value="0.1765" step="0.001"></div>
+      <div class="field-row"><label>Avg supplemental lighting (hrs/day)</label><input type="number" id="suppHrsPerDay" value="6.889" step="0.1"></div>
+    </div>
+
+    <div class="inputs-group">
+      <h3>HVAC Assumptions (per bay, scales continuously)</h3>
+      <div class="field-row"><label>Reference tonnage / bay</label><input type="number" id="referenceTons" value="30" step="5"></div>
+      <div class="field-row"><label>Equipment cost @ reference tonnage ($)<span class="field-note">Desert Aire quote: $90K&ndash;$110K @ 30 tons, midpoint used; scaled flat per ton</span></label><input type="number" id="equipCostAtRefTons" value="100000" step="1000"></div>
+      <div class="field-row"><label>Install cost (% of equipment)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="installPct" value="20" step="1"></div>
+      <div class="field-row"><label>Energy use (kWh / ton / yr)<span class="field-note">back-solved from v2.xlsx 200-ton chiller <span class="badge-placeholder">EST</span></span></label><input type="number" id="kwhPerTonYr" value="2975" step="25"></div>
+      <div class="field-note" style="display:block; margin-top:4px;">HVAC capex override (fixed $ instead of this formula) has moved to Section 2 — Bucket A, next to "Other permanent infra."</div>
+    </div>
+
+    <div class="inputs-group">
+      <h3>Financing Terms</h3>
+      <div class="field-row"><label>Mortgage down payment (%)</label><input type="number" id="downPaymentPct" value="0" step="1"></div>
+      <div class="field-row"><label>Mortgage term (yrs, balloon)</label><input type="number" id="mortgageTermYears" value="5" step="1"></div>
+      <div class="field-row"><label>Mortgage amortization (yrs)</label><input type="number" id="mortgageAmortYears" value="10" step="1"></div>
+      <div class="field-row"><label>Equipment loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="equipTermYears" value="7" step="1"></div>
+      <div class="field-row"><label>OpEx loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="opexTermYears" value="1" step="1"></div>
+      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="6" step="1"></div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>Growth-rate, pricing, OpEx, and mortgage defaults are sourced from
+    <code>Fulton_Bank_Proposalv2.xlsx</code> (Bank Proposal Summary, Sections 5–7). This tool
+    replaces v2's single central 200-ton chiller with a standalone per-bay HVAC unit whose
+    tonnage scales continuously with improved sq ft, and splits financing into 3 independently
+    priced tiers (mortgage / equipment / OpEx) instead of v2's single property mortgage —
+    intentional design differences, not errors, if this tool's totals don't reconcile exactly
+    to v2 at the 10,800 sq ft / full-improvement setting.</p>
+  <p>HVAC equipment pricing is sourced from an actual Desert Aire 30-ton HVACD budgetary quote
+    ($90K&ndash;$110K, midpoint used), scaled linearly ($/ton flat) for other tonnages. Install
+    %, HVAC energy use (kWh/ton/yr), and all loan-term fields are still stated estimates with
+    no source in either workbook (marked <span class="badge-placeholder">EST</span>) — replace
+    with real quotes/terms before using this for anything beyond directional sensitivity.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  function PMT(rate, nper, pv, fv, type) {
+    fv = fv || 0; type = type || 0;
+    if (rate === 0) return -(pv + fv) / nper;
+    var pow = Math.pow(1 + rate, nper);
+    return -(rate * (pv * pow + fv)) / ((pow - 1) * (1 + rate * type));
+  }
+  function FV(rate, nper, pmt, pv, type) {
+    pv = pv || 0; type = type || 0;
+    if (rate === 0) return -(pv + pmt * nper);
+    var pow = Math.pow(1 + rate, nper);
+    return -(pv * pow + pmt * (1 + rate * type) * (pow - 1) / rate);
+  }
+
+  var sliderIds = ["improvedSqFt", "improvedGrowth", "unimprovedGrowth", "pricePerLb", "mortgagePrice", "mortgageRate", "equipRate", "opexRate"];
+  var pctSliderIds = { mortgageRate: 1, equipRate: 1, opexRate: 1 };
+  var fieldIds = [
+    "cyclesPerYear", "commissionPct", "contingencyPct",
+    "payroll", "nutrients", "overhead",
+    "baySqFt", "hpsFixturesPerBay", "hpsWattsPerFixture", "ledFixturesPerBay", "ledWattsPerFixture",
+    "ledCostPerFixture", "electricityRate", "suppHrsPerDay",
+    "referenceTons", "equipCostAtRefTons", "installPct", "kwhPerTonYr", "hvacCapexOverrideAmount",
+    "downPaymentPct", "mortgageTermYears", "mortgageAmortYears", "equipTermYears", "opexTermYears", "monthsOfOpexFinanced",
+    "holidayMonths", "permInfraOther", "buyerEquipOther",
+    "rampStage1Months", "rampStage1Pct", "rampStage2Months", "rampStage2Pct", "rampStage3Months", "rampStage3Pct", "rampStage4Pct",
+    "rampLaborPct", "chartTailMonths"
+  ];
+  var pctFieldIds = {
+    commissionPct: 1, contingencyPct: 1, installPct: 1, downPaymentPct: 1,
+    rampStage1Pct: 1, rampStage2Pct: 1, rampStage3Pct: 1, rampStage4Pct: 1, rampLaborPct: 1
+  };
+
+  // Defaults for fields that may not yet exist in the DOM (added ahead of their markup).
+  // Percent-field defaults are stored as raw (pre-/100) values here, matching the DOM's
+  // convention of holding e.g. "50" for 50% -- readState() below applies the /100 conversion
+  // uniformly for both DOM-sourced and default-sourced values.
+  var fieldDefaults = {
+    holidayMonths: 10, permInfraOther: 0, buyerEquipOther: 91200, hvacCapexOverrideAmount: 0,
+    rampStage1Months: 3, rampStage1Pct: 0,
+    rampStage2Months: 2, rampStage2Pct: 50,
+    rampStage3Months: 4, rampStage3Pct: 75,
+    rampStage4Pct: 100,
+    rampLaborPct: 50,
+    chartTailMonths: 6
+  };
+
+  var usd0 = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  var usd2 = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var num0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+  var num1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  var usdCompact = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
+
+  function pct(x) { return (x * 100).toFixed(1) + "%"; }
+  function safe(n) { return isFinite(n) ? n : 0; }
+
+  // Human-readable financing-treatment labels, so a $0 row always reads as an explained
+  // routing choice rather than a bare/unexplained zero.
+  function permFinancingLabel(v) {
+    if (v === "mortgage") return "folded into Tier 1 mortgage";
+    if (v === "tier2") return "separate Tier 2 loan";
+    if (v === "bank") return "bank pays outright — not financed";
+    return v;
+  }
+  function permFinancingShort(v) {
+    if (v === "mortgage") return "mortgage-folded";
+    if (v === "tier2") return "Tier 2 loan";
+    if (v === "bank") return "bank-paid";
+    return v;
+  }
+  function portFinancingLabel(v) {
+    if (v === "private") return "private equity injection, UCC-1 — $0 debt service";
+    if (v === "tier2") return "separate Tier 2 loan";
+    return v;
+  }
+  function portFinancingShort(v) {
+    if (v === "private") return "private/UCC-1";
+    if (v === "tier2") return "Tier 2 loan";
+    return v;
+  }
+
+  function readState() {
+    var s = {};
+    sliderIds.concat(fieldIds).forEach(function (id) {
+      var domEl = document.getElementById(id);
+      var raw = domEl ? parseFloat(domEl.value) : fieldDefaults[id];
+      var isPct = pctSliderIds[id] || pctFieldIds[id];
+      s[id] = isPct ? raw / 100 : raw;
+    });
+
+    function readRadio(name, fallback) {
+      var checked = document.querySelector('input[name="' + name + '"]:checked');
+      return checked ? checked.value : fallback;
+    }
+    s.holidayMode      = readRadio("holidayMode", "capitalize");
+    s.permFinancing    = readRadio("permFinancing", "mortgage");
+    s.portFinancing    = readRadio("portFinancing", "private");
+    var _rampEl = document.getElementById("rampEnabled");
+    s.rampEnabled      = _rampEl ? _rampEl.checked : false;
+    var _hvacOverrideEl = document.getElementById("hvacCapexOverrideEnabled");
+    s.hvacCapexOverrideEnabled = _hvacOverrideEl ? _hvacOverrideEl.checked : false;
+
+    return s;
+  }
+
+  function el(id) { return document.getElementById(id); }
+  function set(id, text) { el(id).textContent = text; }
+
+  // Core revenue/OpEx/capex economics, independent of financing. Parameterized so callers
+  // other than the steady-state computeModel() (e.g. future ramp-aware month-by-month
+  // callers) can pass a different growth rate, an OpEx ramp multiplier (applied only to the
+  // OpEx lines that actually scale with build-out progress: incremental LED lighting and
+  // HVAC opex, plus nutrients), and a labor multiplier (applied to payroll). At
+  // opexRampMult=1 / laborMult=1 this reproduces today's steady-state numbers exactly.
+  function computeCoreEconomics(s, improvedGrowthRate, opexRampMult, laborMult, contingencyOn) {
+    if (contingencyOn === undefined) contingencyOn = true;
+
+    var totalSqFt = 10800;
+    var improvedSqFt = s.improvedSqFt;
+    var unimprovedSqFt = totalSqFt - improvedSqFt;
+
+    var lbsPerYear = (improvedSqFt * improvedGrowthRate + unimprovedSqFt * s.unimprovedGrowth) * s.cyclesPerYear / 453.6;
+
+    var revenue = lbsPerYear * s.pricePerLb;
+    var commission = revenue * s.commissionPct;
+
+    // Lighting is split into a base term (HPS over the full facility, never gated by ramp)
+    // and an incremental term (LED over improved sq ft, scaled by opexRampMult). At
+    // opexRampMult=1 the sum equals the original single-term totalKw*hrs*365*rate formula.
+    var perSqFtHpsW = (s.hpsFixturesPerBay * s.hpsWattsPerFixture) / s.baySqFt;
+    var perSqFtLedW = (s.ledFixturesPerBay * s.ledWattsPerFixture) / s.baySqFt;
+    var baseLightingKw = (totalSqFt * perSqFtHpsW) / 1000;
+    var incrLightingKw = (improvedSqFt * perSqFtLedW) / 1000;
+    var baseLightingOpex = baseLightingKw * s.suppHrsPerDay * 365 * s.electricityRate;
+    var incrLightingOpex = incrLightingKw * s.suppHrsPerDay * 365 * s.electricityRate * opexRampMult;
+    var lightingOpex = baseLightingOpex + incrLightingOpex;
+
+    // Capacity (tonsNeeded) and capex are sized for the full build-out and stay ungated by
+    // ramp; only the running HVAC opex scales with opexRampMult.
+    var tonsNeeded = improvedSqFt * (s.referenceTons / s.baySqFt);
+    var hvacOpex = tonsNeeded * s.kwhPerTonYr * s.electricityRate * opexRampMult;
+    // Flat $/ton rate off the Desert Aire quote at the reference tonnage, scaled linearly --
+    // unless overridden with a fixed all-in quote (e.g. a real vendor bid for the actual
+    // greenhouses), in which case that number is used as-is instead of being derived from
+    // tonsNeeded/referenceTons/installPct. The override only replaces CAPEX -- hvacOpex above
+    // (the ongoing energy cost) still comes from the tonnage formula either way, since a fixed
+    // buildout quote doesn't tell you the annual electricity draw.
+    var hvacEquipCapex, hvacInstallCapex, hvacCapexTotal;
+    if (s.hvacCapexOverrideEnabled) {
+      hvacEquipCapex = s.hvacCapexOverrideAmount;
+      hvacInstallCapex = 0;
+      hvacCapexTotal = s.hvacCapexOverrideAmount;
+    } else {
+      hvacEquipCapex = tonsNeeded * (s.equipCostAtRefTons / s.referenceTons);
+      hvacInstallCapex = hvacEquipCapex * s.installPct;
+      hvacCapexTotal = hvacEquipCapex + hvacInstallCapex;
+    }
+
+    var ledCapex = improvedSqFt * (s.ledFixturesPerBay * s.ledCostPerFixture / s.baySqFt);
+
+    var effNutrients = s.nutrients * opexRampMult;
+    var effPayroll = s.payroll * laborMult;
+
+    var opexSubtotal = effPayroll + effNutrients + s.overhead + lightingOpex + hvacOpex + commission;
+    var contingency = contingencyOn ? opexSubtotal * s.contingencyPct : 0;
+    var totalOpex = opexSubtotal + contingency;
+
+    var noi = revenue - totalOpex;
+    var margin = revenue !== 0 ? noi / revenue : 0;
+
+    return {
+      totalSqFt: totalSqFt, improvedSqFt: improvedSqFt, unimprovedSqFt: unimprovedSqFt,
+      lbsPerYear: lbsPerYear, revenue: revenue, commission: commission,
+      baseLightingOpex: baseLightingOpex, incrLightingOpex: incrLightingOpex, lightingOpex: lightingOpex,
+      tonsNeeded: tonsNeeded, hvacOpex: hvacOpex,
+      hvacEquipCapex: hvacEquipCapex, hvacInstallCapex: hvacInstallCapex, hvacCapexTotal: hvacCapexTotal,
+      ledCapex: ledCapex, opexSubtotal: opexSubtotal, contingency: contingency, totalOpex: totalOpex,
+      noi: noi, margin: margin
+    };
+  }
+
+  // Tier 1 — Mortgage (balloon), month-by-month amortization schedule with an optional
+  // payment holiday at the start of the term. Three modes:
+  //   "simple"       — payments skipped, no interest accrues (balance frozen).
+  //   "interestOnly" — interest-only payments during the holiday, balance flat.
+  //   "capitalize"   — no payment, accrued interest capitalized onto the balance, then
+  //                    re-amortized over the remaining amortization term so it still
+  //                    reaches zero balance at the original maturity.
+  // Only "capitalize" changes the post-holiday level payment (ds1); "simple" and
+  // "interestOnly" resume the original basePmt, so ds1 is holiday-invariant for those two
+  // modes and only balloon1 moves. At holidayMonths=0 all three modes are identical and
+  // reproduce the prior closed-form ds1/balloon1 exactly.
+  // NaN trap: holidayMonths must stay < amortM, else amortM - holidayMonths <= 0 and the
+  // re-amortization PMT() below divides by zero. Not reachable until the Task 6 slider lands
+  // (plan caps it at 12); no clamp here yet — flagging for whoever wires the UI control.
+  function computeTier1Schedule(principal, annualRate, amortYears, termYears, holidayMonths, holidayMode) {
+    var mRate = annualRate / 12, amortM = amortYears * 12, termM = termYears * 12;
+    var basePmt = -PMT(mRate, amortM, principal);
+    var balance = principal, pmt = basePmt, schedule = [];
+    for (var m = 1; m <= termM; m++) {
+      var interest = balance * mRate, payment, principalPaid;
+      if (m <= holidayMonths) {
+        // Holiday branches mutate `balance` directly (or leave it untouched) rather than
+        // going through the `principalPaid` convention below — there is no principal
+        // component to a $0 or interest-only payment.
+        if (holidayMode === "simple") {              // skip, no accrual — balance frozen
+          payment = 0; interest = 0;
+        } else if (holidayMode === "interestOnly") { // pay interest, balance held flat
+          payment = interest;
+        } else if (holidayMode === "capitalize") {   // accrue unpaid interest onto balance
+          payment = 0; balance += interest;
+        } else {
+          throw new Error("computeTier1Schedule: unknown holidayMode " + holidayMode);
+        }
+      } else {
+        if (holidayMode === "capitalize" && m === holidayMonths + 1) {
+          pmt = -PMT(mRate, amortM - holidayMonths, balance); // ONLY place pmt is reassigned — re-amortizes to the original maturity after a capitalized holiday
+        }
+        payment = pmt; principalPaid = payment - interest; balance -= principalPaid;
+      }
+      schedule.push({ month: m, payment: payment, interest: interest, balance: balance });
+    }
+    var stabilizedPmt = pmt; // post-holiday level payment (== basePmt for simple/interestOnly)
+    return { schedule: schedule, ds1: stabilizedPmt * 12, balloon1: schedule[schedule.length - 1].balance };
+  }
+
+  // Tier 2 — Equipment (fully amortizing, no balloon).
+  function computeTier2(s, capexTier2Total) {
+    var principal2 = capexTier2Total;
+    var ds2 = -PMT(s.equipRate / 12, s.equipTermYears * 12, principal2) * 12;
+    return { principal2: principal2, ds2: ds2 };
+  }
+
+  // Pure function: state in, full computed model out. Used both for rendering and for the
+  // breakeven-price line-fit (the model is affine in pricePerLb, so evaluating it at two
+  // prices and solving for the zero-crossing gives the exact breakeven, no iteration needed).
+  function computeModel(s) {
+    var core = computeCoreEconomics(s, s.improvedGrowth, 1, 1, true);
+
+    // Split-collateral buildout financing — two independent buckets, matching the draft
+    // Dart Bank term sheet (not a single 3-way toggle):
+    //   Bucket A — permanent improvements (structural HVAC + electrical/plumbing/structural
+    //   infra; real tranche ~$350K). Routed via s.permFinancing: "mortgage" folds it into the
+    //   Tier 1 balloon (real deal); "tier2" sends it to the equipment loan; "bank" means the
+    //   bank pays outright, so it is added nowhere and principal1 stays property-only.
+    //   Bucket B — portable equipment (LED + other buyer-furnished gear; real total ~$135,200).
+    //   Routed via s.portFinancing: "private" is a zero-debt-service equity/in-kind UCC-1
+    //   injection (tracked only for the cumulative-cash caveat label, Task 8); "tier2" sends
+    //   it to the equipment loan.
+    var capexPermanent = core.hvacCapexTotal + s.permInfraOther;
+    var capexPortable = core.ledCapex + s.buyerEquipOther;
+
+    // Tier 1 — Mortgage (balloon). Bucket A folds in only under "mortgage" routing.
+    var principal1 = s.mortgagePrice * (1 - s.downPaymentPct);
+    if (s.permFinancing === "mortgage") principal1 += capexPermanent;
+    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths, s.holidayMode);
+
+    // Tier 2 — Equipment (fully amortizing, no balloon). Principal is whichever bucket(s)
+    // chose "tier2" routing; a bucket routed to mortgage/bank/private contributes $0 here.
+    var capexTier2 = (s.permFinancing === "tier2" ? capexPermanent : 0) +
+                     (s.portFinancing === "tier2" ? capexPortable : 0);
+    var t2 = computeTier2(s, capexTier2);
+
+    // Bucket B "private" routing carries zero debt service by design (equity/in-kind, not a
+    // loan) — surfaced here only so recalc()/the Breakdown panel can label the $0, not hide it.
+    var equityInjected = s.portFinancing === "private" ? capexPortable : 0;
+
+    // Tier 3 — OpEx (fully amortizing, no balloon)
+    var principal3 = s.monthsOfOpexFinanced * (core.totalOpex / 12);
+    var ds3 = -PMT(s.opexRate / 12, s.opexTermYears * 12, principal3) * 12;
+
+    var totalDS = t1.ds1 + t2.ds2 + ds3;
+    var profitAfterDS = core.noi - totalDS;
+    var dscr = totalDS !== 0 ? core.noi / totalDS : 0;
+
+    var costPerLbOpex = core.lbsPerYear !== 0 ? core.totalOpex / core.lbsPerYear : 0;
+    var costPerLbFinanced = core.lbsPerYear !== 0 ? (core.totalOpex + totalDS) / core.lbsPerYear : 0;
+
+    // Spread every field computeCoreEconomics returns through automatically (so fields added
+    // to core in later tasks aren't silently dropped), then overlay the financing/derived
+    // fields computed here.
+    return Object.assign({}, core, {
+      capexPermanent: capexPermanent, capexPortable: capexPortable, equityInjected: equityInjected,
+      permFinancing: s.permFinancing, portFinancing: s.portFinancing,
+      principal1: principal1, ds1: t1.ds1, balloon1: t1.balloon1,
+      principal2: t2.principal2, ds2: t2.ds2,
+      principal3: principal3, ds3: ds3,
+      totalDS: totalDS, profitAfterDS: profitAfterDS, dscr: dscr,
+      costPerLbOpex: costPerLbOpex, costPerLbFinanced: costPerLbFinanced
+    });
+  }
+
+  // Production-ramp fraction for a given month of improved-space output (1 = full production).
+  // Unimproved space is steady from month 1 regardless -- the ramp models the lights-first
+  // build-out of the improved bays only. Off (rampEnabled=false) returns 1 always, i.e. today's
+  // instant-full-production behavior.
+  function rampPctForMonth(s, m) {
+    if (!s.rampEnabled) return 1;
+    var b1 = s.rampStage1Months, b2 = b1 + s.rampStage2Months, b3 = b2 + s.rampStage3Months;
+    if (m <= b1) return s.rampStage1Pct;
+    if (m <= b2) return s.rampStage2Pct;
+    if (m <= b3) return s.rampStage3Pct;
+    return s.rampStage4Pct;
+  }
+
+  // First month at which the ramp reaches its terminal (Stage 4) percentage. With the ramp
+  // disabled, production is at 100% from month 1.
+  function rampCompleteMonth(s) {
+    return s.rampEnabled ? (s.rampStage1Months + s.rampStage2Months + s.rampStage3Months + 1) : 1;
+  }
+
+  // Month-by-month simulation reusing the same three financing helpers as computeModel(), so
+  // the transient (ramp + holiday) path and the steady-state snapshot never diverge in their
+  // underlying formulas. Tier 1's schedule is computed once over the full mortgage term (not
+  // just the chart's short horizon) so the balloon and the full amortization table stay
+  // readable even though the chart itself only plots the first `chartHorizon` months.
+  //
+  // Unit convention (settled -- do not re-derive): computeTier1Schedule()'s schedule entries
+  // are already monthly (PMT() returns a monthly payment), so schedule[i].payment is used
+  // as-is, with NO /12. ds2/ds3 come back from computeTier2/the Tier-3 PMT call as annualized
+  // (*12) figures, matching computeModel()'s convention, so they get /12 here to become
+  // monthly. core.noi is annual, so it also gets /12. Getting this wrong (e.g. an extra /12 on
+  // the Tier-1 payment) understates Tier-1 debt service 12x and makes the chart look falsely
+  // profitable -- the steady-state convergence check below (monthlyPL ~= (noi-ds1-ds2-ds3)/12)
+  // is what would catch that class of bug.
+  function simulateMonthly(s) {
+    var core = computeCoreEconomics(s, s.improvedGrowth, 1, 1, true);
+
+    var capexPermanent = core.hvacCapexTotal + s.permInfraOther;
+    var capexPortable = core.ledCapex + s.buyerEquipOther;
+
+    var principal1 = s.mortgagePrice * (1 - s.downPaymentPct);
+    if (s.permFinancing === "mortgage") principal1 += capexPermanent;
+    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths, s.holidayMode);
+
+    var capexTier2 = (s.permFinancing === "tier2" ? capexPermanent : 0) +
+                     (s.portFinancing === "tier2" ? capexPortable : 0);
+    var t2 = computeTier2(s, capexTier2);
+    var equityInjected = s.portFinancing === "private" ? capexPortable : 0;
+
+    var principal3 = s.monthsOfOpexFinanced * (core.totalOpex / 12);
+    var ds3 = -PMT(s.opexRate / 12, s.opexTermYears * 12, principal3) * 12;
+
+    var ds2m = t2.ds2 / 12, ds3m = ds3 / 12;
+    var balloonMonth = s.mortgageTermYears * 12;
+    var horizon = rampCompleteMonth(s) + s.chartTailMonths;
+    var termM = t1.schedule.length; // full mortgage term -- schedule always covers at least this
+
+    var rows = [], cum = 0;
+    for (var m = 1; m <= Math.max(horizon, termM); m++) {
+      var pct = rampPctForMonth(s, m);
+      // Labor is rampLaborPct only while the ramp is incomplete (pct < 1); at/after full
+      // production (or with the ramp disabled, where pct is always 1) labor is 100%.
+      var laborMult = (s.rampEnabled && pct < 1) ? s.rampLaborPct : 1;
+      // Addendum's 180-day stabilization table: no contingency during the mortgage holiday.
+      var contingencyOn = !(m <= s.holidayMonths);
+      var mCore = computeCoreEconomics(s, s.improvedGrowth * pct, pct, laborMult, contingencyOn);
+
+      var noiM = mCore.noi / 12;
+      var schedRow = t1.schedule[m - 1];
+      var t1PaymentM = schedRow ? schedRow.payment : 0; // already monthly -- no /12 (see note above)
+      var balance = schedRow ? schedRow.balance : 0;
+      var monthlyPL = noiM - t1PaymentM - ds2m - ds3m;
+      cum += monthlyPL;
+
+      rows.push({
+        month: m, pct: pct, monthlyPL: monthlyPL, cumulative: cum,
+        tier1Payment: t1PaymentM, balance: balance
+      });
+    }
+
+    return {
+      rows: rows, horizon: horizon, balloon1: t1.balloon1, balloonMonth: balloonMonth,
+      equityInjected: equityInjected
+    };
+  }
+
+  // Solve for the sale price where profitAfterDS crosses zero, by evaluating the (affine)
+  // model at two arbitrary prices and interpolating/extrapolating the line to its root.
+  function breakevenPrice(s) {
+    var p0 = 0, p1 = 1000;
+    var s0 = Object.assign({}, s, { pricePerLb: p0 });
+    var s1 = Object.assign({}, s, { pricePerLb: p1 });
+    var f0 = computeModel(s0).profitAfterDS;
+    var f1 = computeModel(s1).profitAfterDS;
+    var slope = (f1 - f0) / (p1 - p0);
+    if (slope === 0 || !isFinite(slope)) return null;
+    return p0 - f0 / slope;
+  }
+
+  // --- P/L Over Time chart ---------------------------------------------------------------
+  // Vanilla inline-SVG line charts, template-string built (matches this file's existing
+  // string-building idiom) -- no chart library, no Canvas. Two single-series charts share
+  // only the x-axis (month) -- deliberately not a dual-axis chart (two measures of different
+  // scale get two stacked charts, per the plan).
+  var CHART_VB_WIDTH = 600, CHART_PAD_L = 56, CHART_PAD_R = 14, CHART_PAD_B = 20;
+
+  // Rounds a raw tick step up to a "clean" 1/2/5 x 10^n step so axis labels never read
+  // as arbitrary numbers like 1,842.
+  function niceStep(rawStep) {
+    if (rawStep <= 0) return 1;
+    var exp = Math.floor(Math.log(rawStep) / Math.LN10);
+    var base = rawStep / Math.pow(10, exp);
+    var niceBase = base <= 1 ? 1 : base <= 2 ? 2 : base <= 5 ? 5 : 10;
+    return niceBase * Math.pow(10, exp);
+  }
+  function niceTicks(min, max, count) {
+    if (min === max) { min -= 1; max += 1; }
+    var step = niceStep((max - min) / count);
+    var start = Math.ceil(min / step) * step;
+    var ticks = [];
+    for (var v = start; v <= max + 1e-9; v += step) ticks.push(Math.round(v * 100) / 100);
+    return ticks;
+  }
+
+  // Builds one chart's SVG markup. opts: { rows: [{month, value}], height, colorVar (a CSS
+  // custom-property name, e.g. "--accent"), zeroLine (bool, draws a solid hairline at 0 and
+  // forces it into the y-domain), annotations: [{fromMonth, toMonth, label}] (thin bracket
+  // lane above the plot -- ramp/holiday windows -- never a full-height wash), valueFmt(v),
+  // title }. Returns the markup plus the scale info the shared crosshair needs to convert a
+  // pointer X back into a month (both charts are built with identical padding/width so one
+  // scale serves both).
+  function buildLineChartSVG(opts) {
+    var W = CHART_VB_WIDTH, H = opts.height;
+    var hasAnnotations = opts.annotations && opts.annotations.length > 0;
+    var padT = hasAnnotations ? (14 + opts.annotations.length * 13) : 10;
+    var padL = CHART_PAD_L, padR = CHART_PAD_R, padB = CHART_PAD_B;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var months = opts.rows.map(function (r) { return r.month; });
+    var values = opts.rows.map(function (r) { return r.value; });
+    var minMonth = months[0], maxMonth = months[months.length - 1];
+    var minVal = Math.min.apply(null, values), maxVal = Math.max.apply(null, values);
+    if (opts.zeroLine) { minVal = Math.min(minVal, 0); maxVal = Math.max(maxVal, 0); }
+    var span = (maxVal - minVal) || Math.max(Math.abs(maxVal), 1);
+    minVal -= span * 0.1; maxVal += span * 0.1;
+
+    function xFor(m) { return padL + ((m - minMonth) / ((maxMonth - minMonth) || 1)) * plotW; }
+    function yFor(v) { return padT + (1 - (v - minVal) / ((maxVal - minVal) || 1)) * plotH; }
+
+    var gridSvg = niceTicks(minVal, maxVal, 4).map(function (t) {
+      var y = yFor(t);
+      return '<line class="chart-gridline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y + '" y2="' + y + '"></line>' +
+        '<text class="chart-axis-label" x="' + (padL - 6) + '" y="' + (y + 3) + '" text-anchor="end">' + usdCompact.format(t) + '</text>';
+    }).join('');
+
+    var zeroSvg = '';
+    if (opts.zeroLine && minVal <= 0 && maxVal >= 0) {
+      var y0 = yFor(0);
+      zeroSvg = '<line class="chart-zeroline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y0 + '" y2="' + y0 + '"></line>';
+    }
+
+    var xTickCount = Math.min(6, maxMonth - minMonth + 1);
+    var xAxisSvg = '';
+    for (var i = 0; i < xTickCount; i++) {
+      var tm = Math.round(minMonth + (i * (maxMonth - minMonth)) / Math.max(1, xTickCount - 1));
+      xAxisSvg += '<text class="chart-axis-label" x="' + xFor(tm) + '" y="' + (H - 4) + '" text-anchor="middle">' + tm + '</text>';
+    }
+
+    var points = opts.rows.map(function (r) { return xFor(r.month) + ',' + yFor(r.value); }).join(' ');
+    var lastRow = opts.rows[opts.rows.length - 1];
+    var lastX = xFor(lastRow.month), lastY = yFor(lastRow.value);
+    var endAnchor = lastX > W - padR - 60 ? 'end' : 'start';
+    var endX = endAnchor === 'end' ? lastX - 8 : lastX + 8;
+
+    // Each annotation gets its own vertical lane (a fixed 13px row) so overlapping windows
+    // (e.g. holiday + ramp both starting at month 1) get separate brackets/labels instead of
+    // colliding into unreadable overlaid text.
+    var annotationSvg = '';
+    if (hasAnnotations) {
+      annotationSvg = opts.annotations.map(function (a, idx) {
+        var x1 = xFor(a.fromMonth), x2 = xFor(a.toMonth), y = 12 + idx * 13;
+        return '<path class="chart-annotation-bracket" d="M' + x1 + ' ' + (y + 6) + ' L' + x1 + ' ' + y + ' L' + x2 + ' ' + y + ' L' + x2 + ' ' + (y + 6) + '"></path>' +
+          '<text class="chart-annotation-label" x="' + ((x1 + x2) / 2) + '" y="' + (y - 3) + '" text-anchor="middle">' + a.label + '</text>';
+      }).join('');
+    }
+
+    var html =
+      '<div class="chart-card">' +
+        '<div class="chart-title">' + opts.title + '</div>' +
+        '<svg class="chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' +
+          annotationSvg + gridSvg + zeroSvg +
+          '<polyline class="chart-line" points="' + points + '" style="stroke: var(' + opts.colorVar + ')"></polyline>' +
+          '<circle cx="' + lastX + '" cy="' + lastY + '" r="4" fill="var(' + opts.colorVar + ')" stroke="var(--panel)" stroke-width="2"></circle>' +
+          '<text class="chart-endlabel" x="' + endX + '" y="' + (lastY - 8) + '" text-anchor="' + endAnchor + '" fill="var(' + opts.colorVar + ')">' + opts.valueFmt(lastRow.value) + '</text>' +
+          xAxisSvg +
+        '</svg>' +
+      '</div>';
+
+    return { html: html, xFor: xFor, minMonth: minMonth, maxMonth: maxMonth, padL: padL, plotW: plotW };
+  }
+
+  // Shared pointer-tracking crosshair across both stacked mini-charts: one tooltip shows
+  // every series at the hovered month, per the dataviz skill's "one tooltip, every series"
+  // rule -- the reader never has to land precisely on a line.
+  function wireChartCrosshair(rows, scale) {
+    var wrap = el("chart-wrap");
+    var crosshair = el("chart-crosshair");
+    var tooltip = el("chart-tooltip");
+    if (!wrap || !crosshair || !tooltip) return;
+
+    function monthFromClientX(clientX) {
+      var rect = wrap.getBoundingClientRect();
+      var vbX = ((clientX - rect.left) / rect.width) * CHART_VB_WIDTH;
+      var frac = Math.max(0, Math.min(1, (vbX - scale.padL) / scale.plotW));
+      return Math.round(scale.minMonth + frac * (scale.maxMonth - scale.minMonth));
+    }
+
+    function onMove(e) {
+      var month = monthFromClientX(e.clientX);
+      var row = null;
+      for (var i = 0; i < rows.length; i++) { if (rows[i].month === month) { row = rows[i]; break; } }
+      if (!row) return;
+      var rect = wrap.getBoundingClientRect();
+      var pxX = (scale.xFor(month) / CHART_VB_WIDTH) * rect.width;
+      crosshair.style.left = pxX + "px";
+      crosshair.style.display = "block";
+
+      tooltip.textContent = "";
+      var monthLine = document.createElement("div");
+      monthLine.className = "tt-month";
+      monthLine.textContent = "Month " + row.month + " (" + pct(row.pct) + " production)";
+      var plRow = document.createElement("div");
+      plRow.className = "tt-row";
+      plRow.innerHTML = '<span class="tt-label"><span class="tt-key" style="background:var(--accent)"></span>Monthly P/L</span><span class="tt-value"></span>';
+      plRow.querySelector(".tt-value").textContent = usd0.format(row.monthlyPL);
+      var cumRow = document.createElement("div");
+      cumRow.className = "tt-row";
+      cumRow.innerHTML = '<span class="tt-label"><span class="tt-key" style="background:var(--series-2)"></span>Cumulative cash</span><span class="tt-value"></span>';
+      cumRow.querySelector(".tt-value").textContent = usd0.format(row.cumulative);
+      tooltip.appendChild(monthLine);
+      tooltip.appendChild(plRow);
+      tooltip.appendChild(cumRow);
+      tooltip.style.display = "block";
+      var ttLeft = pxX + 14;
+      if (ttLeft + 190 > rect.width) ttLeft = pxX - 204;
+      tooltip.style.left = Math.max(0, ttLeft) + "px";
+      tooltip.style.top = "4px";
+    }
+    function onLeave() { crosshair.style.display = "none"; tooltip.style.display = "none"; }
+
+    wrap.addEventListener("pointermove", onMove);
+    wrap.addEventListener("pointerleave", onLeave);
+  }
+
+  // Renders the P/L Over Time section: two mini-charts, the peak-shortfall / months-to-
+  // positive tiles, the off-chart balloon callout, and the full 60-month table twin.
+  function renderPLSection(s, sim) {
+    var rows = sim.rows.slice(0, sim.horizon);
+
+    var annotations = [];
+    if (s.holidayMonths > 0) {
+      annotations.push({ fromMonth: 1, toMonth: s.holidayMonths, label: "Holiday (mo 1–" + s.holidayMonths + ")" });
+    }
+    if (s.rampEnabled) {
+      var rc = rampCompleteMonth(s) - 1;
+      if (rc >= 1) annotations.push({ fromMonth: 1, toMonth: rc, label: "Ramp (mo 1–" + rc + ")" });
+    }
+
+    var plChart = buildLineChartSVG({
+      rows: rows.map(function (r) { return { month: r.month, value: r.monthlyPL }; }),
+      height: 160, colorVar: "--accent", zeroLine: true, annotations: annotations,
+      valueFmt: function (v) { return usd0.format(v); }, title: "Monthly P/L"
+    });
+    var cumChart = buildLineChartSVG({
+      rows: rows.map(function (r) { return { month: r.month, value: r.cumulative }; }),
+      height: 160, colorVar: "--series-2", zeroLine: true, annotations: annotations,
+      valueFmt: function (v) { return usd0.format(v); }, title: "Cumulative Operating Cash"
+    });
+
+    var container = el("chart-container");
+    container.innerHTML =
+      '<div class="chart-wrap" id="chart-wrap">' + plChart.html + cumChart.html +
+        '<div class="chart-crosshair" id="chart-crosshair"></div>' +
+        '<div class="chart-tooltip" id="chart-tooltip"></div>' +
+      '</div>';
+    wireChartCrosshair(rows, plChart);
+
+    // Scan the FULL simulated schedule (>= the mortgage term, not just the short chart
+    // window) -- a ramp/holiday combo can easily push the cash-positive crossing past the
+    // ~16-month chart horizon, and truncating this search to `rows` (the chart slice) made
+    // that read as "uncalculable" when it was really just off-chart.
+    var fullRows = sim.rows;
+    var peakShortfall = Math.min.apply(null, fullRows.map(function (r) { return r.cumulative; }));
+    var monthsToPositive = null;
+    for (var i = 0; i < fullRows.length; i++) {
+      if (fullRows[i].cumulative >= 0) { monthsToPositive = fullRows[i].month; break; }
+    }
+    var beyondChart = monthsToPositive !== null && monthsToPositive > sim.horizon;
+
+    var tilesEl = el("chart-tiles");
+    tilesEl.innerHTML =
+      '<div class="card"><div class="label">Peak Cash Shortfall</div>' +
+        '<div class="value bad">' + usd0.format(peakShortfall) + '</div>' +
+        '<div class="card-note">Bridge capital needed at the trough of the cumulative curve (full schedule)</div></div>' +
+      '<div class="card"><div class="label">Months to Cash-Positive</div>' +
+        '<div class="value ' + (monthsToPositive !== null ? "good" : "bad") + '">' +
+        (monthsToPositive !== null ? (monthsToPositive + " mo") : ("Not within " + fullRows.length + " months")) + '</div>' +
+        '<div class="card-note">First month cumulative operating cash crosses zero' +
+        (beyondChart ? " — beyond the chart above; see the full schedule table below" : "") + '</div></div>';
+
+    // The balloon sits at month sim.balloonMonth (typically 60), off this short chart by
+    // design -- surfaced as a callout instead of a plotted spike. The caveat names the
+    // private equity injection so its absence from "cumulative cash" isn't silently missing.
+    el("balloon-annotation").textContent =
+      "⛳ Balloon " + usd0.format(sim.balloon1) + " due month " + sim.balloonMonth +
+      ". Cumulative operating cash above excludes closing equity and the " +
+      usd0.format(sim.equityInjected) + " private equipment injection" +
+      (sim.equityInjected > 0 ? "" : " (currently $0 — Bucket B is debt-financed under the current selection)") + ".";
+
+    var tableRows = sim.rows.map(function (r) {
+      return '<tr><td>' + r.month + '</td><td>' + pct(r.pct) + '</td><td>' + usd0.format(r.tier1Payment) + '</td>' +
+        '<td>' + usd0.format(r.balance) + '</td><td>' + usd0.format(r.monthlyPL) + '</td><td>' + usd0.format(r.cumulative) + '</td></tr>';
+    }).join('');
+    el("schedule-table-container").innerHTML =
+      '<table class="schedule-table"><thead><tr><th>Month</th><th>Ramp %</th><th>Tier 1 Payment</th>' +
+      '<th>Tier 1 Balance</th><th>Monthly P/L</th><th>Cumulative Cash</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+
+    set("v-chartTailMonths", s.chartTailMonths + "");
+    set("v-balloonMonth", sim.balloonMonth + "");
+  }
+
+  function recalc() {
+    var s = readState();
+    var m = computeModel(s);
+    var sim = simulateMonthly(s);
+    renderPLSection(s, sim);
+    var improvedSqFt = m.improvedSqFt, unimprovedSqFt = m.unimprovedSqFt, lbsPerYear = m.lbsPerYear,
+        revenue = m.revenue, commission = m.commission, lightingOpex = m.lightingOpex,
+        tonsNeeded = m.tonsNeeded, hvacOpex = m.hvacOpex, hvacEquipCapex = m.hvacEquipCapex,
+        hvacInstallCapex = m.hvacInstallCapex, ledCapex = m.ledCapex, totalOpex = m.totalOpex,
+        noi = m.noi, margin = m.margin, ds1 = m.ds1, balloon1 = m.balloon1, ds2 = m.ds2,
+        principal2 = m.principal2, principal3 = m.principal3, ds3 = m.ds3, totalDS = m.totalDS,
+        profitAfterDS = m.profitAfterDS, dscr = m.dscr, costPerLbOpex = m.costPerLbOpex,
+        costPerLbFinanced = m.costPerLbFinanced, contingency = m.contingency,
+        capexPermanent = m.capexPermanent, capexPortable = m.capexPortable,
+        equityInjected = m.equityInjected, permFinancing = m.permFinancing, portFinancing = m.portFinancing;
+
+    var breakeven = breakevenPrice(s);
+
+    // --- render ---
+    set("v-improvedSqFt", num0.format(improvedSqFt) + " sq ft");
+    set("v-unimprovedSqFt", num0.format(unimprovedSqFt) + " sq ft");
+    set("v-improvedGrowth", num1.format(s.improvedGrowth) + " g/sqft");
+    set("v-unimprovedGrowth", num1.format(s.unimprovedGrowth) + " g/sqft");
+    set("v-pricePerLb", usd2.format(s.pricePerLb) + "/lb");
+    set("v-mortgagePrice", usd0.format(s.mortgagePrice));
+    set("v-mortgageRate", pct(s.mortgageRate));
+    set("v-holidayMonths", s.holidayMonths + " mo");
+    set("v-equipRate", pct(s.equipRate));
+    set("v-opexRate", pct(s.opexRate));
+
+    // Section 5's holiday control is a mirror of Section 1's -- not an independent state
+    // field (readState() never reads its ids), just a synced display so either copy can be
+    // dragged and both stay consistent. Guard the .checked write with a value check so
+    // recalc()'s own re-render never fires an unnecessary "change" event/loop.
+    var holidayMonths2El = el("holidayMonths2");
+    if (holidayMonths2El) holidayMonths2El.value = s.holidayMonths;
+    set("v-holidayMonths2", s.holidayMonths + " mo");
+    document.querySelectorAll('input[name="holidayMode2"]').forEach(function (r) {
+      r.checked = (r.value === s.holidayMode);
+    });
+
+    // Production Ramp: live "-> g/sqft/cycle" readouts per stage, and grey out the stage
+    // inputs (without disabling/clearing them) when the ramp is off, so values persist.
+    set("rr-rampStage1", num1.format(s.improvedGrowth * s.rampStage1Pct) + " g/sqft");
+    set("rr-rampStage2", num1.format(s.improvedGrowth * s.rampStage2Pct) + " g/sqft");
+    set("rr-rampStage3", num1.format(s.improvedGrowth * s.rampStage3Pct) + " g/sqft");
+    set("rr-rampStage4", num1.format(s.improvedGrowth * s.rampStage4Pct) + " g/sqft");
+
+    // "Months after Takeover" -- the cumulative month range each stage covers, derived live
+    // from the Months inputs, so the user isn't hand-adding durations to figure out which
+    // calendar months a stage spans.
+    function monthRangeLabel(startMonth, durationMonths) {
+      if (durationMonths <= 0) return "—";
+      if (durationMonths === 1) return "Month " + startMonth;
+      return "Months " + startMonth + "–" + (startMonth + durationMonths - 1);
+    }
+    var rampB1 = s.rampStage1Months, rampB2 = rampB1 + s.rampStage2Months, rampB3 = rampB2 + s.rampStage3Months;
+    set("mr-rampStage1", monthRangeLabel(1, s.rampStage1Months));
+    set("mr-rampStage2", monthRangeLabel(rampB1 + 1, s.rampStage2Months));
+    set("mr-rampStage3", monthRangeLabel(rampB2 + 1, s.rampStage3Months));
+    set("mr-rampStage4", "Months " + (rampB3 + 1) + "+");
+
+    var rampControlsEl = el("ramp-controls");
+    if (rampControlsEl) rampControlsEl.classList.toggle("ramp-disabled", !s.rampEnabled);
+
+    var heroEl = el("out-profitAfterDS");
+    heroEl.textContent = usd0.format(profitAfterDS);
+    heroEl.className = "value " + (profitAfterDS >= 0 ? "good" : "bad");
+
+    // Year 1 P/L: actual first-12-months sum from the monthly simulation -- unlike
+    // profitAfterDS above (always the fully-ramped steady state), this moves with the ramp
+    // stages, ramp-period labor %, and mortgage holiday, since it's summing real monthly rows
+    // rather than one steady-state annual figure.
+    var year1PL = 0;
+    for (var y1 = 0; y1 < 12 && y1 < sim.rows.length; y1++) year1PL += sim.rows[y1].monthlyPL;
+    var year1El = el("out-year1PL");
+    year1El.textContent = usd0.format(year1PL);
+    year1El.className = "value " + (year1PL >= 0 ? "good" : "bad");
+
+    var breakevenEl = el("out-breakevenPrice");
+    if (breakeven === null) {
+      breakevenEl.textContent = "—";
+      breakevenEl.className = "value";
+    } else {
+      breakevenEl.textContent = usd2.format(breakeven) + "/lb";
+      breakevenEl.className = "value " + (s.pricePerLb >= breakeven ? "good" : "bad");
+    }
+
+    var stickyProfitEl = el("sticky-profitAfterDS");
+    stickyProfitEl.textContent = usd0.format(profitAfterDS);
+    stickyProfitEl.className = "sticky-value " + (profitAfterDS >= 0 ? "good" : "bad");
+
+    var stickyYear1El = el("sticky-year1PL");
+    stickyYear1El.textContent = usd0.format(year1PL);
+    stickyYear1El.className = "sticky-value " + (year1PL >= 0 ? "good" : "bad");
+
+    var stickyBreakevenEl = el("sticky-breakevenPrice");
+    if (breakeven === null) {
+      stickyBreakevenEl.textContent = "—";
+      stickyBreakevenEl.className = "sticky-value";
+    } else {
+      stickyBreakevenEl.textContent = usd2.format(breakeven) + "/lb";
+      stickyBreakevenEl.className = "sticky-value " + (s.pricePerLb >= breakeven ? "good" : "bad");
+    }
+
+    set("out-costPerLbOpex", usd2.format(safe(costPerLbOpex)) + "/lb");
+    set("out-costPerLbFinanced", usd2.format(safe(costPerLbFinanced)) + "/lb");
+
+    set("bd-lbsPerYear", num0.format(lbsPerYear) + " lbs");
+    set("bd-revenue", usd0.format(revenue));
+    set("bd-totalOpex", usd0.format(totalOpex));
+    set("bd-noi", usd0.format(noi));
+    set("bd-margin", pct(margin));
+
+    set("bd-payroll", usd0.format(s.payroll));
+    set("bd-nutrients", usd0.format(s.nutrients));
+    set("bd-overhead", usd0.format(s.overhead));
+    set("bd-lightingOpex", usd0.format(lightingOpex));
+    set("bd-hvacOpex", usd0.format(hvacOpex));
+    set("bd-commission", usd0.format(commission));
+    set("bd-contingency", usd0.format(contingency));
+
+    set("bd-tonsNeeded", num1.format(tonsNeeded) + " tons");
+    set("bd-ledCapex", usd0.format(ledCapex));
+    set("bd-hvacEquipCapex", usd0.format(hvacEquipCapex));
+    set("bd-hvacInstallCapex", usd0.format(hvacInstallCapex));
+    set("bd-capex-heading", "Capex & Buildout Financing — Permanent → " +
+      permFinancingShort(permFinancing) + " · Portable → " + portFinancingShort(portFinancing));
+    set("bd-capexPermanent-label", "Bucket A · Permanent improvements (" + permFinancingLabel(permFinancing) + ")");
+    set("bd-capexPermanent", usd0.format(capexPermanent));
+    set("bd-capexPortable-label", "Bucket B · Portable equipment (" + portFinancingLabel(portFinancing) + ")");
+    set("bd-capexPortable", usd0.format(capexPortable));
+    set("bd-principal2", usd0.format(principal2));
+
+    // Live bucket totals right in Section 2, so the HVAC-formula + "other infra" combination
+    // is visible where the input lives, not just several sections later in the Breakdown.
+    // Only the total figure itself is bold (inherited from .bd-row.total .v); the parenthetical
+    // breakdown is explicitly de-emphasized via .v-sub so it doesn't read as one heavy blob.
+    el("fs-bucketATotal").innerHTML = usd0.format(capexPermanent) +
+      '<span class="v-sub">(HVAC ' + usd0.format(hvacEquipCapex + hvacInstallCapex) + ' + Other ' + usd0.format(s.permInfraOther) + ')</span>';
+    el("fs-bucketBTotal").innerHTML = usd0.format(capexPortable) +
+      '<span class="v-sub">(LED ' + usd0.format(ledCapex) + ' + Other ' + usd0.format(s.buyerEquipOther) + ')</span>';
+
+    set("bd-ds1", usd0.format(ds1));
+    set("bd-balloon1", usd0.format(balloon1));
+    set("bd-ds2", usd0.format(ds2));
+    set("bd-principal3", usd0.format(principal3));
+    set("bd-ds3", usd0.format(ds3));
+    set("bd-totalDS", usd0.format(totalDS));
+    set("bd-dscr", num1.format(dscr) + "x");
+    set("bd-equityInjected", usd0.format(equityInjected));
+  }
+
+  sliderIds.concat(fieldIds).forEach(function (id) {
+    var domEl = document.getElementById(id);
+    if (domEl) domEl.addEventListener("input", recalc);
+  });
+
+  document.querySelectorAll('input[name="holidayMode"],input[name="permFinancing"],input[name="portFinancing"]')
+    .forEach(function (r) { r.addEventListener("change", recalc); });
+  var _re = document.getElementById("rampEnabled");
+  if (_re) _re.addEventListener("change", recalc);
+  var _hvacOverride = document.getElementById("hvacCapexOverrideEnabled");
+  if (_hvacOverride) _hvacOverride.addEventListener("change", recalc);
+
+  // Section 5's holiday mirror: write user interaction back onto the Section 1 canonical
+  // control (the one readState() actually reads), then recalc() re-syncs both displays.
+  var _holidayMonths2El = document.getElementById("holidayMonths2");
+  if (_holidayMonths2El) {
+    _holidayMonths2El.addEventListener("input", function () {
+      var canonicalSlider = document.getElementById("holidayMonths");
+      if (canonicalSlider) canonicalSlider.value = _holidayMonths2El.value;
+      recalc();
+    });
+  }
+  document.querySelectorAll('input[name="holidayMode2"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      if (!r.checked) return;
+      var canonicalRadio = document.querySelector('input[name="holidayMode"][value="' + r.value + '"]');
+      if (canonicalRadio) canonicalRadio.checked = true;
+      recalc();
+    });
+  });
+
+  recalc();
+})();
+</script>
+</body>
+</html>
