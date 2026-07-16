@@ -301,6 +301,10 @@
     <span class="theme-toggle-label">Toggle Mode</span>
     <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme"><span id="theme-toggle-icon">🌙</span><span id="theme-toggle-text">Dark</span></button>
   </div>
+  <div class="theme-toggle-group">
+    <span class="theme-toggle-label">Shared Inputs</span>
+    <button type="button" class="theme-toggle" id="reset-defaults" title="Reset all shared inputs to their default values for everyone viewing this page">Reset to Defaults</button>
+  </div>
   <div class="sticky-summary-item">
     <span class="sticky-label">Steady-State P/L</span>
     <span class="sticky-value" id="sticky-profitAfterDS">—</span>
@@ -575,9 +579,7 @@
 
 <section class="panel">
   <h2><span class="n">7</span>Additional Inputs</h2>
-  <p class="hint">Everything below is editable but not on a slider. Fields marked
-    <span class="badge-placeholder">EST</span> are estimates without a term-sheet or vendor
-    source yet — adjust freely.</p>
+  <p class="hint">Everything below is editable but not on a slider.</p>
   <div class="inputs-groups">
 
     <div class="inputs-group">
@@ -623,8 +625,8 @@
       <div class="field-row"><label>Mortgage down payment (%)</label><input type="number" id="downPaymentPct" value="0" step="1"></div>
       <div class="field-row"><label>Mortgage term (yrs, balloon)</label><input type="number" id="mortgageTermYears" value="5" step="1"></div>
       <div class="field-row"><label>Mortgage amortization (yrs)</label><input type="number" id="mortgageAmortYears" value="10" step="1"></div>
-      <div class="field-row"><label>Private Lender loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="privateLenderTermYears" value="2" step="1"></div>
-      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="6" step="1"></div>
+      <div class="field-row"><label>Private Lender loan term (yrs)</label><input type="number" id="privateLenderTermYears" value="2" step="1"></div>
+      <div class="field-row"><label>Months of OpEx financed</label><input type="number" id="monthsOfOpexFinanced" value="6" step="1"></div>
     </div>
 
   </div>
@@ -1379,11 +1381,26 @@
     });
   })();
 
+  // Snapshot the page's authored default values before any remote Firestore state has had a
+  // chance to overwrite them (the sync module below fetches remote state asynchronously, after
+  // this script has already run), so "Reset to Defaults" has something to reset back to.
+  function captureDefaults() {
+    var d = {};
+    sliderIds.concat(fieldIds).forEach(function (id) {
+      var domEl = document.getElementById(id);
+      if (domEl) d[id] = parseFloat(domEl.value);
+    });
+    var rampEl = document.getElementById("rampEnabled");
+    if (rampEl) d.rampEnabled = rampEl.checked;
+    return d;
+  }
+
   window.__sensitivitySync = {
     sliderIds: sliderIds,
     fieldIds: fieldIds,
     checkboxIds: ["rampEnabled"],
-    recalc: recalc
+    recalc: recalc,
+    defaults: captureDefaults()
   };
 
   recalc();
@@ -1457,6 +1474,16 @@
     if (!elm) return;
     elm.addEventListener(elm.type === "checkbox" ? "change" : "input", scheduleSyncPush);
   });
+
+  var resetBtn = document.getElementById("reset-defaults");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+      var ok = window.confirm("Reset all shared inputs to their default values? This affects everyone currently viewing the page.");
+      if (!ok) return;
+      applyRemoteState(sync.defaults);
+      writeState().catch(function (err) { console.warn("Reset write failed:", err); });
+    });
+  }
 
   getDoc(docRef).then(function (snap) {
     if (snap.exists()) {
