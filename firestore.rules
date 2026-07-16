@@ -1,0 +1,106 @@
+rules_version = '2';
+
+// Deployment: paste this file's contents into Firebase console -> Firestore -> Rules -> Publish.
+// This repo copy is for version control only; publishing is a manual console step.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Single shared document holding the analysis-input state. Anyone can read; anyone can
+    // write, but only a full, exactly-shaped, range-validated payload is accepted -- there is
+    // no login for this app, so this validation (not authentication) is the security boundary.
+    match /sharedState/analysisInputs {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isValidState(request.resource.data);
+      allow delete: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+
+  function isNum(v, lo, hi) {
+    return v is number && v >= lo && v <= hi;
+  }
+
+  function isValidState(d) {
+    return d.keys().hasOnly([
+      'pricePerLb', 'mortgagePrice', 'mortgageRate', 'holidayMonths', 'ledCount',
+      'privateLenderRate', 'yieldAtZeroLeds', 'yieldAtFullLeds',
+      'cyclesPerYear', 'commissionPct', 'contingencyPct',
+      'payroll', 'nutrients', 'overhead', 'facilityUtilityOverhead', 'otherOpex',
+      'baySqFt', 'hpsFixturesPerBay', 'hpsWattsPerFixture', 'ledWattsPerFixture',
+      'ledCostPerFixture', 'electricityRate', 'suppHrsPerDay',
+      'hvacChiller', 'hvacDehumid', 'hvacElectrical', 'hvacDeferredMaint',
+      'downPaymentPct', 'mortgageTermYears', 'mortgageAmortYears', 'privateLenderTermYears',
+      'monthsOfOpexFinanced', 'nonLedBuyerEquip',
+      'rampStage1Months', 'rampStage1Pct', 'rampStage2Months', 'rampStage2Pct',
+      'rampStage3Months', 'rampStage3Pct', 'rampStage4Pct', 'rampLaborPct', 'chartTailMonths',
+      'rampEnabled', 'updatedAt'
+    ])
+    && d.keys().hasAll([
+      'pricePerLb', 'mortgagePrice', 'mortgageRate', 'holidayMonths', 'ledCount',
+      'privateLenderRate', 'yieldAtZeroLeds', 'yieldAtFullLeds',
+      'cyclesPerYear', 'commissionPct', 'contingencyPct',
+      'payroll', 'nutrients', 'overhead', 'facilityUtilityOverhead', 'otherOpex',
+      'baySqFt', 'hpsFixturesPerBay', 'hpsWattsPerFixture', 'ledWattsPerFixture',
+      'ledCostPerFixture', 'electricityRate', 'suppHrsPerDay',
+      'hvacChiller', 'hvacDehumid', 'hvacElectrical', 'hvacDeferredMaint',
+      'downPaymentPct', 'mortgageTermYears', 'mortgageAmortYears', 'privateLenderTermYears',
+      'monthsOfOpexFinanced', 'nonLedBuyerEquip',
+      'rampStage1Months', 'rampStage1Pct', 'rampStage2Months', 'rampStage2Pct',
+      'rampStage3Months', 'rampStage3Pct', 'rampStage4Pct', 'rampLaborPct', 'chartTailMonths',
+      'rampEnabled', 'updatedAt'
+    ])
+    // Slider fields (raw DOM values, pre-percent-conversion)
+    && isNum(d.pricePerLb, 200, 800)
+    && isNum(d.mortgagePrice, 500000, 3000000)
+    && isNum(d.mortgageRate, 4, 12)
+    && isNum(d.holidayMonths, 0, 12)
+    && isNum(d.ledCount, 0, 440)
+    && isNum(d.privateLenderRate, 5, 30)
+    && isNum(d.yieldAtZeroLeds, 0, 20)
+    && isNum(d.yieldAtFullLeds, 20, 50)
+    // Numeric fields
+    && isNum(d.cyclesPerYear, 0, 24)
+    && isNum(d.commissionPct, 0, 100)
+    && isNum(d.contingencyPct, 0, 100)
+    && isNum(d.payroll, 0, 20000000)
+    && isNum(d.nutrients, 0, 20000000)
+    && isNum(d.overhead, 0, 20000000)
+    && isNum(d.facilityUtilityOverhead, 0, 20000000)
+    && isNum(d.otherOpex, 0, 20000000)
+    && isNum(d.baySqFt, 0, 100000)
+    && isNum(d.hpsFixturesPerBay, 0, 1000)
+    && isNum(d.hpsWattsPerFixture, 0, 5000)
+    && isNum(d.ledWattsPerFixture, 0, 5000)
+    && isNum(d.ledCostPerFixture, 0, 100000)
+    && isNum(d.electricityRate, 0, 5)
+    && isNum(d.suppHrsPerDay, 0, 24)
+    && isNum(d.hvacChiller, 0, 50000000)
+    && isNum(d.hvacDehumid, 0, 50000000)
+    && isNum(d.hvacElectrical, 0, 50000000)
+    && isNum(d.hvacDeferredMaint, 0, 50000000)
+    && isNum(d.downPaymentPct, 0, 100)
+    && isNum(d.mortgageTermYears, 0, 60)
+    && isNum(d.mortgageAmortYears, 0, 60)
+    && isNum(d.privateLenderTermYears, 0, 60)
+    && isNum(d.monthsOfOpexFinanced, 0, 60)
+    && isNum(d.nonLedBuyerEquip, 0, 20000000)
+    && isNum(d.rampStage1Months, 0, 60)
+    && isNum(d.rampStage1Pct, 0, 100)
+    && isNum(d.rampStage2Months, 0, 60)
+    && isNum(d.rampStage2Pct, 0, 100)
+    && isNum(d.rampStage3Months, 0, 60)
+    && isNum(d.rampStage3Pct, 0, 100)
+    && isNum(d.rampStage4Pct, 0, 100)
+    && isNum(d.rampLaborPct, 0, 200)
+    && isNum(d.chartTailMonths, 0, 60)
+    // Boolean / metadata
+    && d.rampEnabled is bool
+    && d.updatedAt == request.time;
+  }
+}

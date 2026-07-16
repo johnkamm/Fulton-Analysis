@@ -1379,8 +1379,98 @@
     });
   })();
 
+  window.__sensitivitySync = {
+    sliderIds: sliderIds,
+    fieldIds: fieldIds,
+    checkboxIds: ["rampEnabled"],
+    recalc: recalc
+  };
+
   recalc();
 })();
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyAH1BkUXHHCH_vX4CsUN79lQbP_h3RSXQY",
+    authDomain: "fulton-analysis.firebaseapp.com",
+    projectId: "fulton-analysis",
+    storageBucket: "fulton-analysis.firebasestorage.app",
+    messagingSenderId: "1035367402727",
+    appId: "1:1035367402727:web:d0a430276129f8aae3a642"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+  var docRef = doc(db, "sharedState", "analysisInputs");
+
+  // window.__sensitivitySync is set synchronously by the classic <script> above, which
+  // finishes running (script order + module scripts always deferring to after parsing)
+  // before this module executes -- it's guaranteed to exist here.
+  var sync = window.__sensitivitySync;
+  var syncIds = sync.sliderIds.concat(sync.fieldIds);
+
+  function readRawDomState() {
+    var data = {};
+    syncIds.forEach(function (id) {
+      var elm = document.getElementById(id);
+      if (elm) data[id] = parseFloat(elm.value);
+    });
+    sync.checkboxIds.forEach(function (id) {
+      var elm = document.getElementById(id);
+      if (elm) data[id] = elm.checked;
+    });
+    return data;
+  }
+
+  // Setting .value/.checked programmatically does not fire input/change events, so this
+  // can't loop back into the write listeners registered below.
+  function applyRemoteState(data) {
+    syncIds.forEach(function (id) {
+      var elm = document.getElementById(id);
+      if (elm && data[id] !== undefined) elm.value = data[id];
+    });
+    sync.checkboxIds.forEach(function (id) {
+      var elm = document.getElementById(id);
+      if (elm && data[id] !== undefined) elm.checked = data[id];
+    });
+    sync.recalc();
+  }
+
+  function writeState() {
+    return setDoc(docRef, Object.assign(readRawDomState(), { updatedAt: serverTimestamp() }));
+  }
+
+  var pushTimer = null;
+  function scheduleSyncPush() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      writeState().catch(function (err) { console.warn("Sync write failed:", err); });
+    }, 400);
+  }
+
+  syncIds.concat(sync.checkboxIds).forEach(function (id) {
+    var elm = document.getElementById(id);
+    if (!elm) return;
+    elm.addEventListener(elm.type === "checkbox" ? "change" : "input", scheduleSyncPush);
+  });
+
+  getDoc(docRef).then(function (snap) {
+    if (snap.exists()) {
+      applyRemoteState(snap.data());
+    } else {
+      writeState().catch(function (err) { console.warn("Initial sync seed failed:", err); });
+    }
+    // hasPendingWrites filters out the local-cache echo of our own optimistic write;
+    // only server-confirmed state (ours or another viewer's) gets applied here.
+    onSnapshot(docRef, { includeMetadataChanges: true }, function (snap) {
+      if (snap.metadata.hasPendingWrites || !snap.exists()) return;
+      applyRemoteState(snap.data());
+    });
+  }).catch(function (err) { console.warn("Initial sync load failed:", err); });
 </script>
 </body>
 </html>
