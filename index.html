@@ -202,6 +202,21 @@
   .sticky-summary-item .sticky-value.good { color: var(--good); }
   .sticky-summary-item .sticky-value.bad { color: var(--bad); }
   .sticky-divider { color: var(--border); font-weight: 700; font-size: 1.1rem; margin-left: auto; padding: 0 2px; }
+  .theme-toggle-group {
+    display: flex; align-items: center; gap: 8px; flex: none;
+    margin-right: 16px; /* gap so the control reads as separate from the P/L value beside it */
+  }
+  .theme-toggle-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap;
+  }
+  .theme-toggle {
+    height: 30px; flex: none; border-radius: 15px;
+    border: 1px solid var(--border); background: var(--accent-soft); color: var(--text);
+    font-size: .78rem; font-weight: 700; line-height: 1; cursor: pointer; padding: 0 12px;
+    display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
+  }
+  .theme-toggle:hover { background: var(--border); }
   .field-row input[type=number] {
     width: 118px; padding: 5px 8px; border-radius: 6px;
     border: 1px solid var(--border); background: var(--bg); color: var(--text);
@@ -280,6 +295,10 @@
 <div class="wrap">
 
 <div class="sticky-summary" id="sticky-summary">
+  <div class="theme-toggle-group">
+    <span class="theme-toggle-label">Toggle Mode</span>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme"><span id="theme-toggle-icon">🌙</span><span id="theme-toggle-text">Dark</span></button>
+  </div>
   <div class="sticky-summary-item">
     <span class="sticky-label">Steady-State P/L</span>
     <span class="sticky-value" id="sticky-profitAfterDS">—</span>
@@ -1514,6 +1533,49 @@
       recalc();
     });
   });
+
+  // Manual light/dark toggle. The CSS's :root[data-theme="dark"/"light"] blocks exist
+  // specifically for this -- without this wiring they're unreachable and the page just
+  // follows the OS/browser's prefers-color-scheme, which is why the same file can render
+  // dark on one machine and light on another. Setting data-theme here overrides that per-
+  // viewer OS default; removing it (not used below, but supported by apply(null)) would fall
+  // back to following the OS again.
+  (function initThemeToggle() {
+    var root = document.documentElement;
+    var btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+
+    function systemPrefersDark() {
+      return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+    function isDark() {
+      var attr = root.getAttribute("data-theme");
+      if (attr === "dark") return true;
+      if (attr === "light") return false;
+      return systemPrefersDark();
+    }
+    var iconEl = document.getElementById("theme-toggle-icon");
+    var textEl = document.getElementById("theme-toggle-text");
+    function apply(theme) {
+      if (theme === "dark" || theme === "light") root.setAttribute("data-theme", theme);
+      else root.removeAttribute("data-theme");
+      // Show the CURRENT mode explicitly; the "Toggle Mode" label makes clear a click flips it.
+      var dark = isDark();
+      if (iconEl) iconEl.textContent = dark ? "🌙" : "☀️";
+      if (textEl) textEl.textContent = dark ? "Dark" : "Light";
+    }
+
+    var stored = null;
+    try { stored = localStorage.getItem("sensitivityTheme"); } catch (e) { /* file:// or privacy mode may block storage -- fall back to default */ }
+    // Default to dark mode when the viewer has no saved preference (was: follow OS setting).
+    apply(stored === "light" || stored === "dark" ? stored : "dark");
+
+    btn.addEventListener("click", function () {
+      var next = isDark() ? "light" : "dark";
+      apply(next);
+      try { localStorage.setItem("sensitivityTheme", next); } catch (e) {}
+    });
+  })();
 
   recalc();
 })();
