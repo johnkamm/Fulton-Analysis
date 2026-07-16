@@ -166,20 +166,6 @@
   .field-row label { font-size: .84rem; flex: 1; }
   .field-row .field-note { display: block; font-size: .72rem; color: var(--muted); font-weight: 400; }
 
-  /* Summary callout */
-  .summary-panel {
-    border: 1px solid var(--warn);
-    background: var(--accent-soft);
-    border-radius: 10px;
-    padding: 16px 20px;
-    margin-bottom: 22px;
-  }
-  .summary-panel h2 { font-size: .95rem; margin: 0 0 10px; color: var(--warn); text-transform: uppercase; letter-spacing: .03em; }
-  .summary-panel ol { margin: 0; padding-left: 22px; }
-  .summary-panel li { margin-bottom: 8px; font-size: .88rem; }
-  .summary-panel li:last-child { margin-bottom: 0; }
-  .summary-panel .takeaway { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: .88rem; }
-
   /* Sticky profit/breakeven bar */
   .sticky-summary {
     position: sticky;
@@ -228,11 +214,6 @@
     padding: 0 4px; margin-left: 6px; vertical-align: middle;
   }
 
-  /* Radio groups (holiday mode, financing bucket treatment) */
-  .radio-row { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0; }
-  .radio-row label { display: flex; align-items: center; gap: 5px; font-size: .84rem; font-weight: 400; flex: none; }
-  .radio-row input[type=radio] { accent-color: var(--accent); }
-
   /* Production ramp stage table */
   .ramp-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: 10px 0; }
   .ramp-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .02em; padding: 4px 8px 6px; border-bottom: 1px solid var(--border); }
@@ -253,7 +234,6 @@
     background: var(--accent-soft); border: 1px solid var(--border); border-radius: 8px;
     padding: 12px 16px; margin-bottom: 16px;
   }
-  .chart-controls .radio-row { margin-top: 8px; }
   .chart-wrap { position: relative; }
   .chart-card { margin-bottom: 10px; }
   .chart-card .chart-title { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px; }
@@ -316,171 +296,80 @@
 
 <header>
   <h1>Indoor Sensitivity Analysis</h1>
-  <p class="sub">Pure Coast Holdings — 12504 S 42nd St, Fulton Township / Vicksburg, MI. Explore
-    partial LED + standalone HVAC build-outs against a 3-tier financing structure.</p>
-  <p class="scope">Indoor only — outdoor expansion (Tranche 3) is not modeled here. Exploratory
-    what-if tool, not the bank deliverable (<code>Fulton_Bank_Proposalv2.xlsx</code> is the
-    live deliverable). Defaults are traceable to that workbook where noted; placeholder
-    estimates are flagged.</p>
+  <p class="sub">Pure Coast Holdings — 12504 S 42nd St, Fulton Township / Vicksburg, MI. A
+    scenario/sensitivity exhibit supporting the Dart Bank term sheet — explore how LED
+    build-out, sale price, and financing terms move the project's profitability.</p>
+  <p class="scope">Indoor only — outdoor expansion (Tranche 3) is not modeled here.</p>
 </header>
-
-<section class="summary-panel">
-  <h2>What actually moves the P/L (ranked, at current defaults)</h2>
-  <ol>
-    <li><b>Tier 3 — OpEx financing terms.</b> The single biggest swing in this whole model,
-      bigger than yield or price. Doubling "months of OpEx financed" from 3 → 6 moves profit
-      by <b>&minus;$428K</b>; stretching the 1-year OpEx loan term to 3–5 years moves it
-      <b>+$256K to +$306K</b>. This tier's rate (20%) and 1-year term are stated placeholders
-      (see Additional Inputs) — right now they matter more to the headline number than the
-      actual grow economics do.</li>
-    <li><b>Whether the improvement happens at all.</b> Improved sq ft 0 → 10,800 swings profit
-      by roughly <b>&minus;$746K</b>. This is the core investment decision the tool exists to
-      explore, not a hidden risk — but it's still the largest single lever.</li>
-    <li><b>Improved-space yield rate.</b> A ±5 g/sqft/cycle move (e.g. 40 → 45) swings profit
-      by about <b>±$262K</b> — this is the "real" production upside/downside.</li>
-    <li><b>Sale price.</b> A ±$50/lb move swings profit by about <b>±$220K</b> — comparable in
-      size to the yield lever, as expected since both scale revenue directly.</li>
-    <li><b>Tier 2 — Equipment loan term.</b> Shortening from 7 to 3 years costs about
-      <b>&minus;$166K</b>; the rate matters less (±$30–65K across a 10-point rate swing).</li>
-    <li><b>Base OpEx line items</b> (payroll, overhead, contingency %). A 10% change in any one
-      is worth roughly <b>$30K–$86K</b> — real, but an order of magnitude smaller than the
-      financing-tier and production levers above.</li>
-    <li><b>Tier 1 — Mortgage rate/amortization.</b> The smallest lever here, <b>±$15K–$55K</b>
-      across realistic ranges — it doesn't scale with the improvement decision the way the
-      other two financing tiers do.</li>
-  </ol>
-  <div class="takeaway"><b>Bottom line:</b> before trusting any "Profit After All Debt Service"
-    number out of this tool, check the Tier 3 OpEx financing inputs first. They're the least
-    grounded assumptions in the model (pure placeholders, no vendor quote or lender term sheet
-    behind them) and currently have more influence over the headline than the production
-    assumptions (yield, price) this tool was actually built to stress-test.</div>
-</section>
 
 <section class="panel">
   <h2><span class="n">1</span>Key Levers</h2>
-  <p class="hint">Improved and unimproved square footage always sum to the facility's fixed
-    10,800 sq ft net canopy. HVAC/LED scale continuously with improved sq ft.</p>
+  <p class="hint">The facility's full 10,800 sq ft canopy is treated as improved. Adjust LED
+    count, sale price, and financing terms to see how they move the P&amp;L.</p>
   <div class="sliders-grid">
 
     <div class="slider-row">
-      <label>Improved sq ft <span class="val" id="v-improvedSqFt"></span></label>
-      <input type="range" id="improvedSqFt" min="0" max="10800" step="100" value="10800">
-      <div class="sub-readout"><span>Unimproved: <b id="v-unimprovedSqFt"></b></span><span>Total: 10,800 sq ft (fixed)</span></div>
-    </div>
-
-    <div class="slider-row">
-      <label>Improved growth rate <span class="val" id="v-improvedGrowth"></span></label>
-      <input type="range" id="improvedGrowth" min="20" max="70" step="1" value="40">
-      <div class="sub-readout"><span>g / sq ft / cycle</span><span>v2.xlsx default: 40</span></div>
-    </div>
-
-    <div class="slider-row">
-      <label>Unimproved growth rate <span class="val" id="v-unimprovedGrowth"></span></label>
-      <input type="range" id="unimprovedGrowth" min="5" max="30" step="0.5" value="15">
-      <div class="sub-readout"><span>g / sq ft / cycle</span><span>~1.5 lb/light per harvest (60 HPS, 2,700 sqft)</span></div>
+      <label># of LEDs added <span class="val" id="v-ledCount"></span></label>
+      <input type="range" id="ledCount" min="0" max="440" step="5" value="220">
+      <div class="sub-readout"><span>Total facility fixture count</span><span id="v-derivedGrowth"></span></div>
     </div>
 
     <div class="slider-row">
       <label>Sale price <span class="val" id="v-pricePerLb"></span></label>
       <input type="range" id="pricePerLb" min="200" max="800" step="5" value="475.69">
-      <div class="sub-readout"><span>$ / lb dry</span><span>v2.xlsx default: $475.69</span></div>
+      <div class="sub-readout"><span>$ / lb dry</span><span></span></div>
     </div>
 
     <div class="slider-row">
       <label>Mortgage (property) price <span class="val" id="v-mortgagePrice"></span></label>
       <input type="range" id="mortgagePrice" min="500000" max="3000000" step="50000" value="1800000">
-      <div class="sub-readout"><span>v2.xlsx default: $1,800,000</span><span></span></div>
     </div>
 
     <div class="slider-row">
-      <label>Tier 1 — Mortgage rate <span class="val" id="v-mortgageRate"></span></label>
+      <label>Bank — Mortgage rate <span class="val" id="v-mortgageRate"></span></label>
       <input type="range" id="mortgageRate" min="4" max="12" step="0.25" value="8.5">
-      <div class="flag">v2.xlsx currently ships at 7.00% — 8.5% is this tool's own default</div>
     </div>
 
     <div class="slider-row">
       <label>Mortgage payment holiday <span class="val" id="v-holidayMonths"></span></label>
-      <input type="range" id="holidayMonths" min="0" max="12" step="1" value="10">
-      <div class="sub-readout"><span>months, 0–12</span><span>covers the proposal's 0–10 month ask</span></div>
-      <div class="radio-row" role="radiogroup" aria-label="Holiday mode">
-        <label><input type="radio" name="holidayMode" value="capitalize" checked> Capitalize (default)</label>
-        <label><input type="radio" name="holidayMode" value="interestOnly"> Interest-only</label>
-        <label><input type="radio" name="holidayMode" value="simple"> Simple (no accrual)</label>
-      </div>
-      <div class="flag">Simple mode: payment stops with <b>no interest accrual</b> — lender-generous,
-        not a standard forbearance.</div>
-      <div class="sub-readout"><span>In Simple/Interest-Only modes the holiday changes only the
-        balloon, not the annual payment.</span><span></span></div>
+      <input type="range" id="holidayMonths" min="0" max="12" step="1" value="11">
+      <div class="sub-readout"><span>months, 0–12</span><span>month 1 free, remainder accrues interest</span></div>
     </div>
 
     <div class="slider-row">
-      <label>Tier 2 — Equipment rate <span class="val" id="v-equipRate"></span></label>
-      <input type="range" id="equipRate" min="5" max="25" step="0.5" value="15">
-      <div class="sub-readout"><span>Finances LED + HVAC capex</span><span></span></div>
-    </div>
-
-    <div class="slider-row">
-      <label>Tier 3 — OpEx rate <span class="val" id="v-opexRate"></span></label>
-      <input type="range" id="opexRate" min="5" max="30" step="0.5" value="20">
-      <div class="sub-readout"><span>Finances months-of-OpEx (below)</span><span></span></div>
+      <label>Private Lender rate <span class="val" id="v-privateLenderRate"></span></label>
+      <input type="range" id="privateLenderRate" min="5" max="30" step="0.5" value="15">
+      <div class="sub-readout"><span>Finances LED + equipment + OpEx (below)</span><span></span></div>
     </div>
 
   </div>
 </section>
 
 <section class="panel">
-  <h2><span class="n">2</span>Financing Structure</h2>
-  <p class="hint">Buildout capex splits into two independently-financeable buckets, matching the
-    draft Dart Bank term sheet — not a single 3-way toggle.</p>
+  <h2><span class="n">2</span>Buildout Financing (Fixed Structure)</h2>
+  <p class="hint">Per the Dart Bank term sheet, the buildout capital comes from two sources: the
+    HVAC/construction credit is funded directly by Dart Bank, and equipment + first-180-days
+    operating cash is financed by a private lender. There's no routing choice to make.</p>
   <div class="inputs-groups">
 
     <div class="inputs-group">
-      <h3>Bucket A — Permanent Improvements
-        <span class="field-note">Structural HVAC + electrical/plumbing/structural infra; the Dart
-          Bank term sheet states a single $350K lump for all of it combined, not broken out by
-          component</span></h3>
-      <div class="field-row">
-        <label>Treatment</label>
-        <div class="radio-row" role="radiogroup" aria-label="Permanent improvements financing">
-          <label><input type="radio" name="permFinancing" value="mortgage" checked> Fold into Tier 1 mortgage</label>
-          <label><input type="radio" name="permFinancing" value="tier2"> Separate Tier 2 loan</label>
-          <label><input type="radio" name="permFinancing" value="bank"> Bank pays outright</label>
-        </div>
-      </div>
-      <div class="field-row"><label>Other permanent infra ($)<span class="field-note">electrical/
-        plumbing/structural, everything except HVAC below <span class="badge-placeholder">EST</span> —
-        defaulted to <b>$0</b>, no reliable estimate exists yet. (A prior $250K default was
-        back-solved as $350K minus an assumed $100K HVAC cost — but that $100K was
-        <b>per greenhouse</b>, not facility-wide across all 4, so the subtraction was wrong on top
-        of not matching the tool's own HVAC formula. Removed rather than fixed with another guess
-        — enter a real number here once one exists.)</span></label>
-        <input type="number" id="permInfraOther" value="0" step="10000"></div>
-      <div class="field-row"><label>Override HVAC capex with a fixed $ amount<span class="field-note">skips
-        the tonnage/rate formula (Additional Inputs → HVAC Assumptions) entirely for equipment+install capex;
-        use if you have a real all-in quote for the actual greenhouses. Energy use still applies — a fixed
-        buildout quote doesn't tell you the annual electricity draw</span></label>
-        <input type="checkbox" id="hvacCapexOverrideEnabled"></div>
-      <div class="field-row"><label>Fixed HVAC capex ($, all-in equipment + install)</label>
-        <input type="number" id="hvacCapexOverrideAmount" value="0" step="10000"></div>
-      <div class="bd-row total"><span class="k">Bucket A total (HVAC + other, this tier's financed amount)</span><span class="v" id="fs-bucketATotal"></span></div>
+      <h3>Bank — HVAC &amp; Construction Credit
+        <span class="field-note">$350,000 total, itemized in Additional Inputs → HVAC /
+          Construction Credit. Funded directly by Dart Bank at closing — $0 debt service.</span></h3>
+      <div class="bd-row total"><span class="k">Bank-funded total</span><span class="v" id="fs-hvacBankFundedTotal"></span></div>
     </div>
 
     <div class="inputs-group">
-      <h3>Bucket B — Portable Equipment
-        <span class="field-note">Private-backer/UCC-1 furnished; itemized list totals $135,200 — the
-          term sheet's own round-number placeholder for this tranche is $350K, kept here as the more
-          precise, later itemized figure (confirm before relying on either for a bank conversation)</span></h3>
-      <div class="field-row">
-        <label>Treatment</label>
-        <div class="radio-row" role="radiogroup" aria-label="Portable equipment financing">
-          <label><input type="radio" name="portFinancing" value="private" checked> Private cash injection (equity)</label>
-          <label><input type="radio" name="portFinancing" value="tier2"> Separate Tier 2 loan</label>
-        </div>
-      </div>
-      <div class="field-row"><label>Non-LED buyer-furnished gear ($)<span class="field-note">RadSource
-        $65K + trimmers $12.5K + SteriMist $9.2K + washer $4.5K; with LED capex ⇒ Bucket B ≈ $135,200</span></label>
-        <input type="number" id="buyerEquipOther" value="91200" step="1000"></div>
-      <div class="bd-row total"><span class="k">Bucket B total (LED + other, this tier's financed amount)</span><span class="v" id="fs-bucketBTotal"></span></div>
+      <h3>Private Lender — Equipment + OpEx
+        <span class="field-note">One combined, fully-amortizing loan (rate/term set in Section 1
+          and Additional Inputs → Financing Terms)</span></h3>
+      <div class="field-row"><label>Non-LED buyer-furnished equipment ($)<span class="field-note">Trimmers
+        $12,500 + SteriMist $9,200 + washer $4,500 — matches the term sheet's buyer-furnished
+        equipment list</span></label>
+        <input type="number" id="nonLedBuyerEquip" value="26200" step="1000"></div>
+      <div class="bd-row"><span class="k">LED equipment capex</span><span class="v" id="fs-ledCapex"></span></div>
+      <div class="bd-row"><span class="k">OpEx financed</span><span class="v" id="fs-opexPrincipal"></span></div>
+      <div class="bd-row total"><span class="k">Private Lender loan principal</span><span class="v" id="fs-privateLenderPrincipal"></span></div>
     </div>
 
   </div>
@@ -488,9 +377,9 @@
 
 <section class="panel">
   <h2><span class="n">3</span>Production Ramp</h2>
-  <p class="hint">Applies only to <b>improved-space</b> production — unimproved space is steady
-    from month 1. All fields below carry the <span class="badge-placeholder">EST</span> badge
-    (placeholder values, not sourced).</p>
+  <p class="hint">Models the lights-first build-out timeline — production scales up in stages
+    as the LED build-out and crew reach full capacity. All fields below carry the
+    <span class="badge-placeholder">EST</span> badge (placeholder values, not sourced).</p>
   <div class="field-row ramp-toggle-row">
     <input type="checkbox" id="rampEnabled" checked>
     <label for="rampEnabled">Enable production ramp</label>
@@ -498,7 +387,7 @@
   <div id="ramp-controls">
     <table class="ramp-table">
       <thead>
-        <tr><th>Stage</th><th>Months</th><th>Months after Takeover</th><th>% of improved-growth slider</th><th>→ g/sqft/cycle</th></tr>
+        <tr><th>Stage</th><th>Months</th><th>Months after Takeover</th><th>% of derived growth rate</th><th>→ g/sqft/cycle</th></tr>
       </thead>
       <tbody>
         <tr>
@@ -536,8 +425,8 @@
     <div class="field-row"><label>Chart tail (steady-state months shown after ramp completes)</label>
       <input type="number" id="chartTailMonths" value="6" step="1"></div>
   </div>
-  <div class="flag">Defaults assume a winter/shoulder takeover (lights-first productivity beats
-    unimproved even before the chiller lands). A peak-summer takeover is HVAC-limited — lower
+  <div class="flag">Defaults assume a winter/shoulder takeover, when supplemental lighting
+    contributes the most to yield. A peak-summer takeover relies more on natural light — lower
     the early stages. Ref: ±$200K seasonality swing.</div>
 </section>
 
@@ -578,18 +467,13 @@
 <section class="panel">
   <h2><span class="n">5</span>P/L Over Time</h2>
   <p class="hint">Monthly path from close through ramp-up plus <span id="v-chartTailMonths"></span>
-    steady-state months. The Tier 1 balloon (month <span id="v-balloonMonth"></span>) is off this
-    short chart — see the callout and full table below.</p>
+    steady-state months. The Bank mortgage balloon (month <span id="v-balloonMonth"></span>) is
+    off this short chart — see the callout and full table below.</p>
 
   <div class="chart-controls">
     <div class="slider-row">
       <label>Mortgage payment holiday <span class="val" id="v-holidayMonths2"></span></label>
-      <input type="range" id="holidayMonths2" min="0" max="12" step="1" value="10">
-    </div>
-    <div class="radio-row" role="radiogroup" aria-label="Holiday mode (chart controls)">
-      <label><input type="radio" name="holidayMode2" value="capitalize" checked> Capitalize</label>
-      <label><input type="radio" name="holidayMode2" value="interestOnly"> Interest-only</label>
-      <label><input type="radio" name="holidayMode2" value="simple"> Simple (no accrual)</label>
+      <input type="range" id="holidayMonths2" min="0" max="12" step="1" value="11">
     </div>
     <div class="sub-readout"><span>Mirrors the Section 1 holiday control — adjust here or there,
       both stay in sync</span><span></span></div>
@@ -623,32 +507,31 @@
       <div class="bd-row"><span class="k">Nutrients / IPM / testing</span><span class="v" id="bd-nutrients"></span></div>
       <div class="bd-row"><span class="k">Overhead</span><span class="v" id="bd-overhead"></span></div>
       <div class="bd-row"><span class="k">Lighting electricity</span><span class="v" id="bd-lightingOpex"></span></div>
-      <div class="bd-row"><span class="k">HVAC electricity</span><span class="v" id="bd-hvacOpex"></span></div>
+      <div class="bd-row"><span class="k">Facility utility overhead</span><span class="v" id="bd-facilityUtilityOverhead"></span></div>
       <div class="bd-row"><span class="k">Sales commission</span><span class="v" id="bd-commission"></span></div>
+      <div class="bd-row"><span class="k">Other</span><span class="v" id="bd-otherOpex"></span></div>
       <div class="bd-row"><span class="k">Contingency</span><span class="v" id="bd-contingency"></span></div>
     </div>
 
     <div class="bd-block">
-      <h3 id="bd-capex-heading">Capex &amp; Buildout Financing</h3>
-      <div class="bd-row"><span class="k">Tons of HVAC needed</span><span class="v" id="bd-tonsNeeded"></span></div>
+      <h3>Capex &amp; Buildout Financing (Fixed Structure)</h3>
       <div class="bd-row"><span class="k">LED capex</span><span class="v" id="bd-ledCapex"></span></div>
-      <div class="bd-row"><span class="k">HVAC equipment capex</span><span class="v" id="bd-hvacEquipCapex"></span></div>
-      <div class="bd-row"><span class="k">HVAC install capex</span><span class="v" id="bd-hvacInstallCapex"></span></div>
-      <div class="bd-row"><span class="k" id="bd-capexPermanent-label"></span><span class="v" id="bd-capexPermanent"></span></div>
-      <div class="bd-row"><span class="k" id="bd-capexPortable-label"></span><span class="v" id="bd-capexPortable"></span></div>
-      <div class="bd-row total"><span class="k">Total financed via Tier 2</span><span class="v" id="bd-principal2"></span></div>
+      <div class="bd-row"><span class="k">Non-LED buyer equipment</span><span class="v" id="bd-nonLedEquip"></span></div>
+      <div class="bd-row"><span class="k">Central Chiller</span><span class="v" id="bd-hvacChiller"></span></div>
+      <div class="bd-row"><span class="k">Dehumidification Coils</span><span class="v" id="bd-hvacDehumid"></span></div>
+      <div class="bd-row"><span class="k">Electrical Additions</span><span class="v" id="bd-hvacElectrical"></span></div>
+      <div class="bd-row"><span class="k">Deferred Maintenance</span><span class="v" id="bd-hvacDeferredMaint"></span></div>
+      <div class="bd-row total"><span class="k">Bank-funded HVAC/construction credit total</span><span class="v" id="bd-hvacTotal"></span></div>
+      <div class="bd-row total"><span class="k">Private Lender loan principal (LED + equipment + OpEx)</span><span class="v" id="bd-principalPL"></span></div>
     </div>
 
     <div class="bd-block">
-      <h3>Financing (3 tiers)</h3>
-      <div class="bd-row"><span class="k">Tier 1 · Mortgage debt service</span><span class="v" id="bd-ds1"></span></div>
-      <div class="bd-row"><span class="k">Tier 1 · Balloon at maturity</span><span class="v" id="bd-balloon1"></span></div>
-      <div class="bd-row"><span class="k">Tier 2 · Equipment debt service</span><span class="v" id="bd-ds2"></span></div>
-      <div class="bd-row"><span class="k">Tier 3 · OpEx principal financed</span><span class="v" id="bd-principal3"></span></div>
-      <div class="bd-row"><span class="k">Tier 3 · OpEx debt service</span><span class="v" id="bd-ds3"></span></div>
+      <h3>Financing (2 Tiers — Bank / Private Lender)</h3>
+      <div class="bd-row"><span class="k">Bank · Mortgage debt service</span><span class="v" id="bd-ds1"></span></div>
+      <div class="bd-row"><span class="k">Bank · Mortgage balloon at maturity</span><span class="v" id="bd-balloon1"></span></div>
+      <div class="bd-row"><span class="k">Private Lender · Debt service</span><span class="v" id="bd-dsPL"></span></div>
       <div class="bd-row total"><span class="k">Total annual debt service</span><span class="v" id="bd-totalDS"></span></div>
       <div class="bd-row"><span class="k">DSCR (NOI ÷ total debt service)</span><span class="v" id="bd-dscr"></span></div>
-      <div class="bd-row"><span class="k">Private equity injected (Bucket B, UCC-1)</span><span class="v" id="bd-equityInjected"></span></div>
     </div>
 
   </div>
@@ -657,43 +540,46 @@
 <section class="panel">
   <h2><span class="n">7</span>Additional Inputs</h2>
   <p class="hint">Everything below is editable but not on a slider. Fields marked
-    <span class="badge-placeholder">EST</span> are estimates with no source in either
-    workbook — adjust freely.</p>
+    <span class="badge-placeholder">EST</span> are estimates without a term-sheet or vendor
+    source yet — adjust freely.</p>
   <div class="inputs-groups">
 
     <div class="inputs-group">
       <h3>Production &amp; Pricing</h3>
       <div class="field-row"><label>Cycles / year</label><input type="number" id="cyclesPerYear" value="5" step="1"></div>
       <div class="field-row"><label>Sales commission (%)</label><input type="number" id="commissionPct" value="5" step="0.5"></div>
-      <div class="field-row"><label>Contingency (%)</label><input type="number" id="contingencyPct" value="15" step="0.5"></div>
+      <div class="field-row"><label>Contingency (%)</label><input type="number" id="contingencyPct" value="0" step="0.5"></div>
     </div>
 
     <div class="inputs-group">
       <h3>Base Indoor OpEx</h3>
-      <div class="field-row"><label>Payroll ($/yr)</label><input type="number" id="payroll" value="200000" step="1000"></div>
-      <div class="field-row"><label>Nutrients / IPM / CO2 / testing ($/yr)</label><input type="number" id="nutrients" value="126998" step="1000"></div>
-      <div class="field-row"><label>Overhead ($/yr)</label><input type="number" id="overhead" value="219186" step="1000"></div>
+      <div class="field-row"><label>Payroll ($/yr)</label><input type="number" id="payroll" value="537600" step="1000"></div>
+      <div class="field-row"><label>Nutrients / IPM / CO2 / testing ($/yr)</label><input type="number" id="nutrients" value="144600" step="1000"></div>
+      <div class="field-row"><label>Overhead ($/yr)</label><input type="number" id="overhead" value="98186" step="1000"></div>
+      <div class="field-row"><label>Facility utility overhead ($/yr)<span class="field-note">Gas, water, HVAC electric, base-building
+        electric — grow-lighting electricity is tracked separately below and moves with the LED slider</span></label>
+        <input type="number" id="facilityUtilityOverhead" value="42662" step="1000"></div>
+      <div class="field-row"><label>Other ($/yr)</label><input type="number" id="otherOpex" value="0" step="1000"></div>
     </div>
 
     <div class="inputs-group">
       <h3>Lighting Assumptions</h3>
-      <div class="field-row"><label>Bay size (sq ft per HVAC/LED unit)</label><input type="number" id="baySqFt" value="2800" step="100"></div>
+      <div class="field-row"><label>Bay size (sq ft per HPS density unit)</label><input type="number" id="baySqFt" value="2800" step="100"></div>
       <div class="field-row"><label>Existing HPS fixtures / bay</label><input type="number" id="hpsFixturesPerBay" value="60" step="1"></div>
       <div class="field-row"><label>HPS watts / fixture</label><input type="number" id="hpsWattsPerFixture" value="1000" step="10"></div>
-      <div class="field-row"><label>Added LED fixtures / bay</label><input type="number" id="ledFixturesPerBay" value="110" step="1"></div>
+      <div class="field-row"><label>Added LED fixtures (total facility)</label><input type="number" id="ledFixturesTotal" value="220" step="5"></div>
       <div class="field-row"><label>LED watts / fixture</label><input type="number" id="ledWattsPerFixture" value="645" step="5"></div>
-      <div class="field-row"><label>LED cost / fixture (purchase + install) ($)</label><input type="number" id="ledCostPerFixture" value="300" step="10"></div>
+      <div class="field-row"><label>LED cost / fixture (purchase + install) ($)</label><input type="number" id="ledCostPerFixture" value="200" step="10"></div>
       <div class="field-row"><label>Electricity rate ($/kWh)</label><input type="number" id="electricityRate" value="0.1765" step="0.001"></div>
       <div class="field-row"><label>Avg supplemental lighting (hrs/day)</label><input type="number" id="suppHrsPerDay" value="6.889" step="0.1"></div>
     </div>
 
     <div class="inputs-group">
-      <h3>HVAC Assumptions (per bay, scales continuously)</h3>
-      <div class="field-row"><label>Reference tonnage / bay</label><input type="number" id="referenceTons" value="30" step="5"></div>
-      <div class="field-row"><label>Equipment cost @ reference tonnage ($)<span class="field-note">Desert Aire quote: $90K&ndash;$110K @ 30 tons, midpoint used; scaled flat per ton</span></label><input type="number" id="equipCostAtRefTons" value="100000" step="1000"></div>
-      <div class="field-row"><label>Install cost (% of equipment)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="installPct" value="20" step="1"></div>
-      <div class="field-row"><label>Energy use (kWh / ton / yr)<span class="field-note">back-solved from v2.xlsx 200-ton chiller <span class="badge-placeholder">EST</span></span></label><input type="number" id="kwhPerTonYr" value="2975" step="25"></div>
-      <div class="field-note" style="display:block; margin-top:4px;">HVAC capex override (fixed $ instead of this formula) has moved to Section 2 — Bucket A, next to "Other permanent infra."</div>
+      <h3>HVAC / Construction Credit (Fixed, Term Sheet)</h3>
+      <div class="field-row"><label>Central Chiller (refurb 150-ton)</label><input type="number" id="hvacChiller" value="215000" step="5000"></div>
+      <div class="field-row"><label>Dehumidification Coils (8 units)</label><input type="number" id="hvacDehumid" value="65000" step="5000"></div>
+      <div class="field-row"><label>Electrical Additions</label><input type="number" id="hvacElectrical" value="35000" step="5000"></div>
+      <div class="field-row"><label>Deferred Maintenance</label><input type="number" id="hvacDeferredMaint" value="35000" step="5000"></div>
     </div>
 
     <div class="inputs-group">
@@ -701,27 +587,19 @@
       <div class="field-row"><label>Mortgage down payment (%)</label><input type="number" id="downPaymentPct" value="0" step="1"></div>
       <div class="field-row"><label>Mortgage term (yrs, balloon)</label><input type="number" id="mortgageTermYears" value="5" step="1"></div>
       <div class="field-row"><label>Mortgage amortization (yrs)</label><input type="number" id="mortgageAmortYears" value="10" step="1"></div>
-      <div class="field-row"><label>Equipment loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="equipTermYears" value="7" step="1"></div>
-      <div class="field-row"><label>OpEx loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="opexTermYears" value="1" step="1"></div>
-      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="6" step="1"></div>
+      <div class="field-row"><label>Private Lender loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="privateLenderTermYears" value="2" step="1"></div>
+      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="4" step="1"></div>
     </div>
 
   </div>
 </section>
 
 <footer>
-  <p>Growth-rate, pricing, OpEx, and mortgage defaults are sourced from
-    <code>Fulton_Bank_Proposalv2.xlsx</code> (Bank Proposal Summary, Sections 5–7). This tool
-    replaces v2's single central 200-ton chiller with a standalone per-bay HVAC unit whose
-    tonnage scales continuously with improved sq ft, and splits financing into 3 independently
-    priced tiers (mortgage / equipment / OpEx) instead of v2's single property mortgage —
-    intentional design differences, not errors, if this tool's totals don't reconcile exactly
-    to v2 at the 10,800 sq ft / full-improvement setting.</p>
-  <p>HVAC equipment pricing is sourced from an actual Desert Aire 30-ton HVACD budgetary quote
-    ($90K&ndash;$110K, midpoint used), scaled linearly ($/ton flat) for other tonnages. Install
-    %, HVAC energy use (kWh/ton/yr), and all loan-term fields are still stated estimates with
-    no source in either workbook (marked <span class="badge-placeholder">EST</span>) — replace
-    with real quotes/terms before using this for anything beyond directional sensitivity.</p>
+  <p>Property price, mortgage terms, HVAC/construction-credit costs, and Base Indoor OpEx
+    figures are sourced from the Dart Bank term sheet. OpEx figures are annualized (×2) from
+    the term sheet's 180-day Buyer Contributions breakdown. Production yield, LED equipment
+    cost, and financing-rate/term fields remain user-editable sensitivity inputs for scenario
+    testing.</p>
 </footer>
 
 </div>
@@ -743,21 +621,21 @@
     return -(pv * pow + pmt * (1 + rate * type) * (pow - 1) / rate);
   }
 
-  var sliderIds = ["improvedSqFt", "improvedGrowth", "unimprovedGrowth", "pricePerLb", "mortgagePrice", "mortgageRate", "equipRate", "opexRate"];
-  var pctSliderIds = { mortgageRate: 1, equipRate: 1, opexRate: 1 };
+  var sliderIds = ["pricePerLb", "mortgagePrice", "mortgageRate", "holidayMonths", "ledCount", "privateLenderRate"];
+  var pctSliderIds = { mortgageRate: 1, privateLenderRate: 1 };
   var fieldIds = [
     "cyclesPerYear", "commissionPct", "contingencyPct",
-    "payroll", "nutrients", "overhead",
-    "baySqFt", "hpsFixturesPerBay", "hpsWattsPerFixture", "ledFixturesPerBay", "ledWattsPerFixture",
+    "payroll", "nutrients", "overhead", "facilityUtilityOverhead", "otherOpex",
+    "baySqFt", "hpsFixturesPerBay", "hpsWattsPerFixture", "ledWattsPerFixture",
     "ledCostPerFixture", "electricityRate", "suppHrsPerDay",
-    "referenceTons", "equipCostAtRefTons", "installPct", "kwhPerTonYr", "hvacCapexOverrideAmount",
-    "downPaymentPct", "mortgageTermYears", "mortgageAmortYears", "equipTermYears", "opexTermYears", "monthsOfOpexFinanced",
-    "holidayMonths", "permInfraOther", "buyerEquipOther",
+    "hvacChiller", "hvacDehumid", "hvacElectrical", "hvacDeferredMaint",
+    "downPaymentPct", "mortgageTermYears", "mortgageAmortYears", "privateLenderTermYears", "monthsOfOpexFinanced",
+    "nonLedBuyerEquip",
     "rampStage1Months", "rampStage1Pct", "rampStage2Months", "rampStage2Pct", "rampStage3Months", "rampStage3Pct", "rampStage4Pct",
     "rampLaborPct", "chartTailMonths"
   ];
   var pctFieldIds = {
-    commissionPct: 1, contingencyPct: 1, installPct: 1, downPaymentPct: 1,
+    commissionPct: 1, contingencyPct: 1, downPaymentPct: 1,
     rampStage1Pct: 1, rampStage2Pct: 1, rampStage3Pct: 1, rampStage4Pct: 1, rampLaborPct: 1
   };
 
@@ -766,7 +644,7 @@
   // convention of holding e.g. "50" for 50% -- readState() below applies the /100 conversion
   // uniformly for both DOM-sourced and default-sourced values.
   var fieldDefaults = {
-    holidayMonths: 10, permInfraOther: 0, buyerEquipOther: 91200, hvacCapexOverrideAmount: 0,
+    nonLedBuyerEquip: 26200,
     rampStage1Months: 3, rampStage1Pct: 0,
     rampStage2Months: 2, rampStage2Pct: 50,
     rampStage3Months: 4, rampStage3Pct: 75,
@@ -784,31 +662,6 @@
   function pct(x) { return (x * 100).toFixed(1) + "%"; }
   function safe(n) { return isFinite(n) ? n : 0; }
 
-  // Human-readable financing-treatment labels, so a $0 row always reads as an explained
-  // routing choice rather than a bare/unexplained zero.
-  function permFinancingLabel(v) {
-    if (v === "mortgage") return "folded into Tier 1 mortgage";
-    if (v === "tier2") return "separate Tier 2 loan";
-    if (v === "bank") return "bank pays outright — not financed";
-    return v;
-  }
-  function permFinancingShort(v) {
-    if (v === "mortgage") return "mortgage-folded";
-    if (v === "tier2") return "Tier 2 loan";
-    if (v === "bank") return "bank-paid";
-    return v;
-  }
-  function portFinancingLabel(v) {
-    if (v === "private") return "private equity injection, UCC-1 — $0 debt service";
-    if (v === "tier2") return "separate Tier 2 loan";
-    return v;
-  }
-  function portFinancingShort(v) {
-    if (v === "private") return "private/UCC-1";
-    if (v === "tier2") return "Tier 2 loan";
-    return v;
-  }
-
   function readState() {
     var s = {};
     sliderIds.concat(fieldIds).forEach(function (id) {
@@ -818,17 +671,13 @@
       s[id] = isPct ? raw / 100 : raw;
     });
 
-    function readRadio(name, fallback) {
-      var checked = document.querySelector('input[name="' + name + '"]:checked');
-      return checked ? checked.value : fallback;
-    }
-    s.holidayMode      = readRadio("holidayMode", "capitalize");
-    s.permFinancing    = readRadio("permFinancing", "mortgage");
-    s.portFinancing    = readRadio("portFinancing", "private");
+    // Yield is derived from the LED slider, not set independently: 0 LEDs -> 15 g/sqft/cycle,
+    // 220 LEDs (the term sheet's purchase count) -> 40 g/sqft/cycle, linear, not clamped above
+    // 220 so the slider can still explore buying more than the term sheet specifies.
+    s.improvedGrowth = 15 + (s.ledCount / 220) * (40 - 15);
+
     var _rampEl = document.getElementById("rampEnabled");
     s.rampEnabled      = _rampEl ? _rampEl.checked : false;
-    var _hvacOverrideEl = document.getElementById("hvacCapexOverrideEnabled");
-    s.hvacCapexOverrideEnabled = _hvacOverrideEl ? _hvacOverrideEl.checked : false;
 
     return s;
   }
@@ -837,61 +686,42 @@
   function set(id, text) { el(id).textContent = text; }
 
   // Core revenue/OpEx/capex economics, independent of financing. Parameterized so callers
-  // other than the steady-state computeModel() (e.g. future ramp-aware month-by-month
-  // callers) can pass a different growth rate, an OpEx ramp multiplier (applied only to the
-  // OpEx lines that actually scale with build-out progress: incremental LED lighting and
-  // HVAC opex, plus nutrients), and a labor multiplier (applied to payroll). At
-  // opexRampMult=1 / laborMult=1 this reproduces today's steady-state numbers exactly.
+  // other than the steady-state computeModel() (e.g. the ramp-aware month-by-month caller)
+  // can pass a different growth rate, an OpEx ramp multiplier (applied only to the OpEx lines
+  // that actually scale with build-out progress: incremental LED lighting and nutrients), and
+  // a labor multiplier (applied to payroll). At opexRampMult=1 / laborMult=1 this reproduces
+  // today's steady-state numbers exactly. The whole facility's 10,800 sq ft canopy is treated
+  // as uniformly improved -- there is no separate unimproved-space term.
   function computeCoreEconomics(s, improvedGrowthRate, opexRampMult, laborMult, contingencyOn) {
     if (contingencyOn === undefined) contingencyOn = true;
 
     var totalSqFt = 10800;
-    var improvedSqFt = s.improvedSqFt;
-    var unimprovedSqFt = totalSqFt - improvedSqFt;
 
-    var lbsPerYear = (improvedSqFt * improvedGrowthRate + unimprovedSqFt * s.unimprovedGrowth) * s.cyclesPerYear / 453.6;
+    var lbsPerYear = totalSqFt * improvedGrowthRate * s.cyclesPerYear / 453.6;
 
     var revenue = lbsPerYear * s.pricePerLb;
     var commission = revenue * s.commissionPct;
 
-    // Lighting is split into a base term (HPS over the full facility, never gated by ramp)
-    // and an incremental term (LED over improved sq ft, scaled by opexRampMult). At
-    // opexRampMult=1 the sum equals the original single-term totalKw*hrs*365*rate formula.
+    // Lighting is split into a base term (existing HPS across the facility, density-scaled
+    // via baySqFt, never gated by ramp) and an incremental term (added LED fixtures, a flat
+    // total-facility count, scaled by opexRampMult).
     var perSqFtHpsW = (s.hpsFixturesPerBay * s.hpsWattsPerFixture) / s.baySqFt;
-    var perSqFtLedW = (s.ledFixturesPerBay * s.ledWattsPerFixture) / s.baySqFt;
     var baseLightingKw = (totalSqFt * perSqFtHpsW) / 1000;
-    var incrLightingKw = (improvedSqFt * perSqFtLedW) / 1000;
+    var incrLightingKw = (s.ledCount * s.ledWattsPerFixture) / 1000;
     var baseLightingOpex = baseLightingKw * s.suppHrsPerDay * 365 * s.electricityRate;
     var incrLightingOpex = incrLightingKw * s.suppHrsPerDay * 365 * s.electricityRate * opexRampMult;
     var lightingOpex = baseLightingOpex + incrLightingOpex;
 
-    // Capacity (tonsNeeded) and capex are sized for the full build-out and stay ungated by
-    // ramp; only the running HVAC opex scales with opexRampMult.
-    var tonsNeeded = improvedSqFt * (s.referenceTons / s.baySqFt);
-    var hvacOpex = tonsNeeded * s.kwhPerTonYr * s.electricityRate * opexRampMult;
-    // Flat $/ton rate off the Desert Aire quote at the reference tonnage, scaled linearly --
-    // unless overridden with a fixed all-in quote (e.g. a real vendor bid for the actual
-    // greenhouses), in which case that number is used as-is instead of being derived from
-    // tonsNeeded/referenceTons/installPct. The override only replaces CAPEX -- hvacOpex above
-    // (the ongoing energy cost) still comes from the tonnage formula either way, since a fixed
-    // buildout quote doesn't tell you the annual electricity draw.
-    var hvacEquipCapex, hvacInstallCapex, hvacCapexTotal;
-    if (s.hvacCapexOverrideEnabled) {
-      hvacEquipCapex = s.hvacCapexOverrideAmount;
-      hvacInstallCapex = 0;
-      hvacCapexTotal = s.hvacCapexOverrideAmount;
-    } else {
-      hvacEquipCapex = tonsNeeded * (s.equipCostAtRefTons / s.referenceTons);
-      hvacInstallCapex = hvacEquipCapex * s.installPct;
-      hvacCapexTotal = hvacEquipCapex + hvacInstallCapex;
-    }
+    var ledCapex = s.ledCount * s.ledCostPerFixture;
 
-    var ledCapex = improvedSqFt * (s.ledFixturesPerBay * s.ledCostPerFixture / s.baySqFt);
+    // HVAC / construction credit: 4 fixed dollar fields from the term sheet, no formula.
+    var hvacCapexTotal = s.hvacChiller + s.hvacDehumid + s.hvacElectrical + s.hvacDeferredMaint;
 
     var effNutrients = s.nutrients * opexRampMult;
     var effPayroll = s.payroll * laborMult;
 
-    var opexSubtotal = effPayroll + effNutrients + s.overhead + lightingOpex + hvacOpex + commission;
+    var opexSubtotal = effPayroll + effNutrients + s.overhead + s.facilityUtilityOverhead
+                      + lightingOpex + commission + s.otherOpex;
     var contingency = contingencyOn ? opexSubtotal * s.contingencyPct : 0;
     var totalOpex = opexSubtotal + contingency;
 
@@ -899,66 +729,47 @@
     var margin = revenue !== 0 ? noi / revenue : 0;
 
     return {
-      totalSqFt: totalSqFt, improvedSqFt: improvedSqFt, unimprovedSqFt: unimprovedSqFt,
+      totalSqFt: totalSqFt,
       lbsPerYear: lbsPerYear, revenue: revenue, commission: commission,
       baseLightingOpex: baseLightingOpex, incrLightingOpex: incrLightingOpex, lightingOpex: lightingOpex,
-      tonsNeeded: tonsNeeded, hvacOpex: hvacOpex,
-      hvacEquipCapex: hvacEquipCapex, hvacInstallCapex: hvacInstallCapex, hvacCapexTotal: hvacCapexTotal,
+      hvacCapexTotal: hvacCapexTotal,
       ledCapex: ledCapex, opexSubtotal: opexSubtotal, contingency: contingency, totalOpex: totalOpex,
       noi: noi, margin: margin
     };
   }
 
-  // Tier 1 — Mortgage (balloon), month-by-month amortization schedule with an optional
-  // payment holiday at the start of the term. Three modes:
-  //   "simple"       — payments skipped, no interest accrues (balance frozen).
-  //   "interestOnly" — interest-only payments during the holiday, balance flat.
-  //   "capitalize"   — no payment, accrued interest capitalized onto the balance, then
-  //                    re-amortized over the remaining amortization term so it still
-  //                    reaches zero balance at the original maturity.
-  // Only "capitalize" changes the post-holiday level payment (ds1); "simple" and
-  // "interestOnly" resume the original basePmt, so ds1 is holiday-invariant for those two
-  // modes and only balloon1 moves. At holidayMonths=0 all three modes are identical and
-  // reproduce the prior closed-form ds1/balloon1 exactly.
-  // NaN trap: holidayMonths must stay < amortM, else amortM - holidayMonths <= 0 and the
-  // re-amortization PMT() below divides by zero. Not reachable until the Task 6 slider lands
-  // (plan caps it at 12); no clamp here yet — flagging for whoever wires the UI control.
-  function computeTier1Schedule(principal, annualRate, amortYears, termYears, holidayMonths, holidayMode) {
+  // Tier 1 — Mortgage (balloon), month-by-month amortization schedule with the term sheet's
+  // 2-phase payment holiday: month 1 is fully free (no payment, no interest accrual); the
+  // remaining holiday months have payment paused with interest accruing (capitalizing) onto
+  // the balance. At holiday-end the payment is re-amortized once over the remaining
+  // amortization term so the loan still reaches zero balance at the original maturity.
+  function computeTier1Schedule(principal, annualRate, amortYears, termYears, holidayMonths) {
     var mRate = annualRate / 12, amortM = amortYears * 12, termM = termYears * 12;
     var basePmt = -PMT(mRate, amortM, principal);
     var balance = principal, pmt = basePmt, schedule = [];
+    var phase1End = Math.min(1, holidayMonths);
     for (var m = 1; m <= termM; m++) {
       var interest = balance * mRate, payment, principalPaid;
-      if (m <= holidayMonths) {
-        // Holiday branches mutate `balance` directly (or leave it untouched) rather than
-        // going through the `principalPaid` convention below — there is no principal
-        // component to a $0 or interest-only payment.
-        if (holidayMode === "simple") {              // skip, no accrual — balance frozen
-          payment = 0; interest = 0;
-        } else if (holidayMode === "interestOnly") { // pay interest, balance held flat
-          payment = interest;
-        } else if (holidayMode === "capitalize") {   // accrue unpaid interest onto balance
-          payment = 0; balance += interest;
-        } else {
-          throw new Error("computeTier1Schedule: unknown holidayMode " + holidayMode);
-        }
+      if (m <= phase1End) {                // Phase 1: zero payment, zero accrual
+        payment = 0; interest = 0;
+      } else if (m <= holidayMonths) {      // Phase 2: payment paused, interest capitalizes onto balance
+        payment = 0; balance += interest;
       } else {
-        if (holidayMode === "capitalize" && m === holidayMonths + 1) {
-          pmt = -PMT(mRate, amortM - holidayMonths, balance); // ONLY place pmt is reassigned — re-amortizes to the original maturity after a capitalized holiday
+        if (holidayMonths >= 1 && m === holidayMonths + 1) {
+          pmt = -PMT(mRate, amortM - holidayMonths, balance); // re-amortize once, at holiday end
         }
         payment = pmt; principalPaid = payment - interest; balance -= principalPaid;
       }
       schedule.push({ month: m, payment: payment, interest: interest, balance: balance });
     }
-    var stabilizedPmt = pmt; // post-holiday level payment (== basePmt for simple/interestOnly)
-    return { schedule: schedule, ds1: stabilizedPmt * 12, balloon1: schedule[schedule.length - 1].balance };
+    return { schedule: schedule, ds1: pmt * 12, balloon1: schedule[schedule.length - 1].balance };
   }
 
-  // Tier 2 — Equipment (fully amortizing, no balloon).
-  function computeTier2(s, capexTier2Total) {
-    var principal2 = capexTier2Total;
-    var ds2 = -PMT(s.equipRate / 12, s.equipTermYears * 12, principal2) * 12;
-    return { principal2: principal2, ds2: ds2 };
+  // Private Lender — one combined, fully-amortizing loan (no balloon), covering LED +
+  // non-LED equipment capex plus the financed OpEx pool.
+  function computePrivateLenderLoan(s, principalPL) {
+    var dsPL = -PMT(s.privateLenderRate / 12, s.privateLenderTermYears * 12, principalPL) * 12;
+    return { principalPL: principalPL, dsPL: dsPL };
   }
 
   // Pure function: state in, full computed model out. Used both for rendering and for the
@@ -967,54 +778,31 @@
   function computeModel(s) {
     var core = computeCoreEconomics(s, s.improvedGrowth, 1, 1, true);
 
-    // Split-collateral buildout financing — two independent buckets, matching the draft
-    // Dart Bank term sheet (not a single 3-way toggle):
-    //   Bucket A — permanent improvements (structural HVAC + electrical/plumbing/structural
-    //   infra; real tranche ~$350K). Routed via s.permFinancing: "mortgage" folds it into the
-    //   Tier 1 balloon (real deal); "tier2" sends it to the equipment loan; "bank" means the
-    //   bank pays outright, so it is added nowhere and principal1 stays property-only.
-    //   Bucket B — portable equipment (LED + other buyer-furnished gear; real total ~$135,200).
-    //   Routed via s.portFinancing: "private" is a zero-debt-service equity/in-kind UCC-1
-    //   injection (tracked only for the cumulative-cash caveat label, Task 8); "tier2" sends
-    //   it to the equipment loan.
-    var capexPermanent = core.hvacCapexTotal + s.permInfraOther;
-    var capexPortable = core.ledCapex + s.buyerEquipOther;
-
-    // Tier 1 — Mortgage (balloon). Bucket A folds in only under "mortgage" routing.
+    // Two-tier financing, matching the Dart Bank term sheet exactly:
+    //   Bank — the $1.8M property mortgage only. The HVAC/construction credit is funded
+    //   directly by Dart Bank at closing and never folds into the mortgage principal.
+    //   Private Lender — one combined, fully-amortizing loan covering LED equipment, non-LED
+    //   buyer-furnished equipment, and the financed OpEx pool.
     var principal1 = s.mortgagePrice * (1 - s.downPaymentPct);
-    if (s.permFinancing === "mortgage") principal1 += capexPermanent;
-    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths, s.holidayMode);
+    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths);
 
-    // Tier 2 — Equipment (fully amortizing, no balloon). Principal is whichever bucket(s)
-    // chose "tier2" routing; a bucket routed to mortgage/bank/private contributes $0 here.
-    var capexTier2 = (s.permFinancing === "tier2" ? capexPermanent : 0) +
-                     (s.portFinancing === "tier2" ? capexPortable : 0);
-    var t2 = computeTier2(s, capexTier2);
+    var opexPrincipal = s.monthsOfOpexFinanced * (core.totalOpex / 12);
+    var principalPL = core.ledCapex + s.nonLedBuyerEquip + opexPrincipal;
+    var pl = computePrivateLenderLoan(s, principalPL);
 
-    // Bucket B "private" routing carries zero debt service by design (equity/in-kind, not a
-    // loan) — surfaced here only so recalc()/the Breakdown panel can label the $0, not hide it.
-    var equityInjected = s.portFinancing === "private" ? capexPortable : 0;
-
-    // Tier 3 — OpEx (fully amortizing, no balloon)
-    var principal3 = s.monthsOfOpexFinanced * (core.totalOpex / 12);
-    var ds3 = -PMT(s.opexRate / 12, s.opexTermYears * 12, principal3) * 12;
-
-    var totalDS = t1.ds1 + t2.ds2 + ds3;
+    var totalDS = t1.ds1 + pl.dsPL;
     var profitAfterDS = core.noi - totalDS;
     var dscr = totalDS !== 0 ? core.noi / totalDS : 0;
 
     var costPerLbOpex = core.lbsPerYear !== 0 ? core.totalOpex / core.lbsPerYear : 0;
     var costPerLbFinanced = core.lbsPerYear !== 0 ? (core.totalOpex + totalDS) / core.lbsPerYear : 0;
 
-    // Spread every field computeCoreEconomics returns through automatically (so fields added
-    // to core in later tasks aren't silently dropped), then overlay the financing/derived
-    // fields computed here.
+    // Spread every field computeCoreEconomics returns through automatically, then overlay the
+    // financing/derived fields computed here.
     return Object.assign({}, core, {
-      capexPermanent: capexPermanent, capexPortable: capexPortable, equityInjected: equityInjected,
-      permFinancing: s.permFinancing, portFinancing: s.portFinancing,
+      opexPrincipal: opexPrincipal,
       principal1: principal1, ds1: t1.ds1, balloon1: t1.balloon1,
-      principal2: t2.principal2, ds2: t2.ds2,
-      principal3: principal3, ds3: ds3,
+      principalPL: principalPL, dsPL: pl.dsPL,
       totalDS: totalDS, profitAfterDS: profitAfterDS, dscr: dscr,
       costPerLbOpex: costPerLbOpex, costPerLbFinanced: costPerLbFinanced
     });
@@ -1039,7 +827,7 @@
     return s.rampEnabled ? (s.rampStage1Months + s.rampStage2Months + s.rampStage3Months + 1) : 1;
   }
 
-  // Month-by-month simulation reusing the same three financing helpers as computeModel(), so
+  // Month-by-month simulation reusing the same two financing helpers as computeModel(), so
   // the transient (ramp + holiday) path and the steady-state snapshot never diverge in their
   // underlying formulas. Tier 1's schedule is computed once over the full mortgage term (not
   // just the chart's short horizon) so the balloon and the full amortization table stay
@@ -1047,31 +835,23 @@
   //
   // Unit convention (settled -- do not re-derive): computeTier1Schedule()'s schedule entries
   // are already monthly (PMT() returns a monthly payment), so schedule[i].payment is used
-  // as-is, with NO /12. ds2/ds3 come back from computeTier2/the Tier-3 PMT call as annualized
-  // (*12) figures, matching computeModel()'s convention, so they get /12 here to become
-  // monthly. core.noi is annual, so it also gets /12. Getting this wrong (e.g. an extra /12 on
-  // the Tier-1 payment) understates Tier-1 debt service 12x and makes the chart look falsely
-  // profitable -- the steady-state convergence check below (monthlyPL ~= (noi-ds1-ds2-ds3)/12)
-  // is what would catch that class of bug.
+  // as-is, with NO /12. dsPL comes back from computePrivateLenderLoan as an annualized (*12)
+  // figure, matching computeModel()'s convention, so it gets /12 here to become monthly.
+  // core.noi is annual, so it also gets /12. Getting this wrong (e.g. an extra /12 on the
+  // Tier-1 payment) understates Bank debt service 12x and makes the chart look falsely
+  // profitable -- the steady-state convergence check (monthlyPL ~= (noi-ds1-dsPL)/12) is what
+  // would catch that class of bug.
   function simulateMonthly(s) {
     var core = computeCoreEconomics(s, s.improvedGrowth, 1, 1, true);
 
-    var capexPermanent = core.hvacCapexTotal + s.permInfraOther;
-    var capexPortable = core.ledCapex + s.buyerEquipOther;
-
     var principal1 = s.mortgagePrice * (1 - s.downPaymentPct);
-    if (s.permFinancing === "mortgage") principal1 += capexPermanent;
-    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths, s.holidayMode);
+    var t1 = computeTier1Schedule(principal1, s.mortgageRate, s.mortgageAmortYears, s.mortgageTermYears, s.holidayMonths);
 
-    var capexTier2 = (s.permFinancing === "tier2" ? capexPermanent : 0) +
-                     (s.portFinancing === "tier2" ? capexPortable : 0);
-    var t2 = computeTier2(s, capexTier2);
-    var equityInjected = s.portFinancing === "private" ? capexPortable : 0;
+    var opexPrincipal = s.monthsOfOpexFinanced * (core.totalOpex / 12);
+    var principalPL = core.ledCapex + s.nonLedBuyerEquip + opexPrincipal;
+    var pl = computePrivateLenderLoan(s, principalPL);
 
-    var principal3 = s.monthsOfOpexFinanced * (core.totalOpex / 12);
-    var ds3 = -PMT(s.opexRate / 12, s.opexTermYears * 12, principal3) * 12;
-
-    var ds2m = t2.ds2 / 12, ds3m = ds3 / 12;
+    var dsPLm = pl.dsPL / 12;
     var balloonMonth = s.mortgageTermYears * 12;
     var horizon = rampCompleteMonth(s) + s.chartTailMonths;
     var termM = t1.schedule.length; // full mortgage term -- schedule always covers at least this
@@ -1090,7 +870,7 @@
       var schedRow = t1.schedule[m - 1];
       var t1PaymentM = schedRow ? schedRow.payment : 0; // already monthly -- no /12 (see note above)
       var balance = schedRow ? schedRow.balance : 0;
-      var monthlyPL = noiM - t1PaymentM - ds2m - ds3m;
+      var monthlyPL = noiM - t1PaymentM - dsPLm;
       cum += monthlyPL;
 
       rows.push({
@@ -1100,8 +880,7 @@
     }
 
     return {
-      rows: rows, horizon: horizon, balloon1: t1.balloon1, balloonMonth: balloonMonth,
-      equityInjected: equityInjected
+      rows: rows, horizon: horizon, balloon1: t1.balloon1, balloonMonth: balloonMonth
     };
   }
 
@@ -1330,21 +1109,18 @@
         (beyondChart ? " — beyond the chart above; see the full schedule table below" : "") + '</div></div>';
 
     // The balloon sits at month sim.balloonMonth (typically 60), off this short chart by
-    // design -- surfaced as a callout instead of a plotted spike. The caveat names the
-    // private equity injection so its absence from "cumulative cash" isn't silently missing.
+    // design -- surfaced as a callout instead of a plotted spike.
     el("balloon-annotation").textContent =
       "⛳ Balloon " + usd0.format(sim.balloon1) + " due month " + sim.balloonMonth +
-      ". Cumulative operating cash above excludes closing equity and the " +
-      usd0.format(sim.equityInjected) + " private equipment injection" +
-      (sim.equityInjected > 0 ? "" : " (currently $0 — Bucket B is debt-financed under the current selection)") + ".";
+      ". Cumulative operating cash above excludes closing costs.";
 
     var tableRows = sim.rows.map(function (r) {
       return '<tr><td>' + r.month + '</td><td>' + pct(r.pct) + '</td><td>' + usd0.format(r.tier1Payment) + '</td>' +
         '<td>' + usd0.format(r.balance) + '</td><td>' + usd0.format(r.monthlyPL) + '</td><td>' + usd0.format(r.cumulative) + '</td></tr>';
     }).join('');
     el("schedule-table-container").innerHTML =
-      '<table class="schedule-table"><thead><tr><th>Month</th><th>Ramp %</th><th>Tier 1 Payment</th>' +
-      '<th>Tier 1 Balance</th><th>Monthly P/L</th><th>Cumulative Cash</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+      '<table class="schedule-table"><thead><tr><th>Month</th><th>Ramp %</th><th>Bank Payment</th>' +
+      '<th>Bank Balance</th><th>Monthly P/L</th><th>Cumulative Cash</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
 
     set("v-chartTailMonths", s.chartTailMonths + "");
     set("v-balloonMonth", sim.balloonMonth + "");
@@ -1355,30 +1131,25 @@
     var m = computeModel(s);
     var sim = simulateMonthly(s);
     renderPLSection(s, sim);
-    var improvedSqFt = m.improvedSqFt, unimprovedSqFt = m.unimprovedSqFt, lbsPerYear = m.lbsPerYear,
+    var lbsPerYear = m.lbsPerYear,
         revenue = m.revenue, commission = m.commission, lightingOpex = m.lightingOpex,
-        tonsNeeded = m.tonsNeeded, hvacOpex = m.hvacOpex, hvacEquipCapex = m.hvacEquipCapex,
-        hvacInstallCapex = m.hvacInstallCapex, ledCapex = m.ledCapex, totalOpex = m.totalOpex,
-        noi = m.noi, margin = m.margin, ds1 = m.ds1, balloon1 = m.balloon1, ds2 = m.ds2,
-        principal2 = m.principal2, principal3 = m.principal3, ds3 = m.ds3, totalDS = m.totalDS,
+        ledCapex = m.ledCapex, totalOpex = m.totalOpex,
+        noi = m.noi, margin = m.margin, ds1 = m.ds1, balloon1 = m.balloon1,
+        opexPrincipal = m.opexPrincipal, principalPL = m.principalPL, dsPL = m.dsPL, totalDS = m.totalDS,
         profitAfterDS = m.profitAfterDS, dscr = m.dscr, costPerLbOpex = m.costPerLbOpex,
         costPerLbFinanced = m.costPerLbFinanced, contingency = m.contingency,
-        capexPermanent = m.capexPermanent, capexPortable = m.capexPortable,
-        equityInjected = m.equityInjected, permFinancing = m.permFinancing, portFinancing = m.portFinancing;
+        hvacCapexTotal = m.hvacCapexTotal;
 
     var breakeven = breakevenPrice(s);
 
     // --- render ---
-    set("v-improvedSqFt", num0.format(improvedSqFt) + " sq ft");
-    set("v-unimprovedSqFt", num0.format(unimprovedSqFt) + " sq ft");
-    set("v-improvedGrowth", num1.format(s.improvedGrowth) + " g/sqft");
-    set("v-unimprovedGrowth", num1.format(s.unimprovedGrowth) + " g/sqft");
+    set("v-ledCount", num0.format(s.ledCount));
+    set("v-derivedGrowth", "→ " + num1.format(s.improvedGrowth) + " g/sqft/cycle");
     set("v-pricePerLb", usd2.format(s.pricePerLb) + "/lb");
     set("v-mortgagePrice", usd0.format(s.mortgagePrice));
     set("v-mortgageRate", pct(s.mortgageRate));
     set("v-holidayMonths", s.holidayMonths + " mo");
-    set("v-equipRate", pct(s.equipRate));
-    set("v-opexRate", pct(s.opexRate));
+    set("v-privateLenderRate", pct(s.privateLenderRate));
 
     // Section 5's holiday control is a mirror of Section 1's -- not an independent state
     // field (readState() never reads its ids), just a synced display so either copy can be
@@ -1387,9 +1158,10 @@
     var holidayMonths2El = el("holidayMonths2");
     if (holidayMonths2El) holidayMonths2El.value = s.holidayMonths;
     set("v-holidayMonths2", s.holidayMonths + " mo");
-    document.querySelectorAll('input[name="holidayMode2"]').forEach(function (r) {
-      r.checked = (r.value === s.holidayMode);
-    });
+
+    // Section 7's LED field is a mirror of Section 1's ledCount slider -- same pattern.
+    var ledFixturesTotalEl = el("ledFixturesTotal");
+    if (ledFixturesTotalEl) ledFixturesTotalEl.value = s.ledCount;
 
     // Production Ramp: live "-> g/sqft/cycle" readouts per stage, and grey out the stage
     // inputs (without disabling/clearing them) when the ramp is off, so values persist.
@@ -1468,52 +1240,40 @@
     set("bd-nutrients", usd0.format(s.nutrients));
     set("bd-overhead", usd0.format(s.overhead));
     set("bd-lightingOpex", usd0.format(lightingOpex));
-    set("bd-hvacOpex", usd0.format(hvacOpex));
+    set("bd-facilityUtilityOverhead", usd0.format(s.facilityUtilityOverhead));
     set("bd-commission", usd0.format(commission));
+    set("bd-otherOpex", usd0.format(s.otherOpex));
     set("bd-contingency", usd0.format(contingency));
 
-    set("bd-tonsNeeded", num1.format(tonsNeeded) + " tons");
     set("bd-ledCapex", usd0.format(ledCapex));
-    set("bd-hvacEquipCapex", usd0.format(hvacEquipCapex));
-    set("bd-hvacInstallCapex", usd0.format(hvacInstallCapex));
-    set("bd-capex-heading", "Capex & Buildout Financing — Permanent → " +
-      permFinancingShort(permFinancing) + " · Portable → " + portFinancingShort(portFinancing));
-    set("bd-capexPermanent-label", "Bucket A · Permanent improvements (" + permFinancingLabel(permFinancing) + ")");
-    set("bd-capexPermanent", usd0.format(capexPermanent));
-    set("bd-capexPortable-label", "Bucket B · Portable equipment (" + portFinancingLabel(portFinancing) + ")");
-    set("bd-capexPortable", usd0.format(capexPortable));
-    set("bd-principal2", usd0.format(principal2));
+    set("bd-nonLedEquip", usd0.format(s.nonLedBuyerEquip));
+    set("bd-hvacChiller", usd0.format(s.hvacChiller));
+    set("bd-hvacDehumid", usd0.format(s.hvacDehumid));
+    set("bd-hvacElectrical", usd0.format(s.hvacElectrical));
+    set("bd-hvacDeferredMaint", usd0.format(s.hvacDeferredMaint));
+    set("bd-hvacTotal", usd0.format(hvacCapexTotal));
+    set("bd-principalPL", usd0.format(principalPL));
 
-    // Live bucket totals right in Section 2, so the HVAC-formula + "other infra" combination
-    // is visible where the input lives, not just several sections later in the Breakdown.
-    // Only the total figure itself is bold (inherited from .bd-row.total .v); the parenthetical
-    // breakdown is explicitly de-emphasized via .v-sub so it doesn't read as one heavy blob.
-    el("fs-bucketATotal").innerHTML = usd0.format(capexPermanent) +
-      '<span class="v-sub">(HVAC ' + usd0.format(hvacEquipCapex + hvacInstallCapex) + ' + Other ' + usd0.format(s.permInfraOther) + ')</span>';
-    el("fs-bucketBTotal").innerHTML = usd0.format(capexPortable) +
-      '<span class="v-sub">(LED ' + usd0.format(ledCapex) + ' + Other ' + usd0.format(s.buyerEquipOther) + ')</span>';
+    // Live readouts in Section 2, so the loan composition is visible where the inputs live,
+    // not just later in the Breakdown.
+    set("fs-hvacBankFundedTotal", usd0.format(hvacCapexTotal));
+    set("fs-ledCapex", usd0.format(ledCapex));
+    set("fs-opexPrincipal", usd0.format(opexPrincipal));
+    set("fs-privateLenderPrincipal", usd0.format(principalPL));
 
     set("bd-ds1", usd0.format(ds1));
     set("bd-balloon1", usd0.format(balloon1));
-    set("bd-ds2", usd0.format(ds2));
-    set("bd-principal3", usd0.format(principal3));
-    set("bd-ds3", usd0.format(ds3));
+    set("bd-dsPL", usd0.format(dsPL));
     set("bd-totalDS", usd0.format(totalDS));
     set("bd-dscr", num1.format(dscr) + "x");
-    set("bd-equityInjected", usd0.format(equityInjected));
   }
 
   sliderIds.concat(fieldIds).forEach(function (id) {
     var domEl = document.getElementById(id);
     if (domEl) domEl.addEventListener("input", recalc);
   });
-
-  document.querySelectorAll('input[name="holidayMode"],input[name="permFinancing"],input[name="portFinancing"]')
-    .forEach(function (r) { r.addEventListener("change", recalc); });
   var _re = document.getElementById("rampEnabled");
   if (_re) _re.addEventListener("change", recalc);
-  var _hvacOverride = document.getElementById("hvacCapexOverrideEnabled");
-  if (_hvacOverride) _hvacOverride.addEventListener("change", recalc);
 
   // Section 5's holiday mirror: write user interaction back onto the Section 1 canonical
   // control (the one readState() actually reads), then recalc() re-syncs both displays.
@@ -1525,14 +1285,17 @@
       recalc();
     });
   }
-  document.querySelectorAll('input[name="holidayMode2"]').forEach(function (r) {
-    r.addEventListener("change", function () {
-      if (!r.checked) return;
-      var canonicalRadio = document.querySelector('input[name="holidayMode"][value="' + r.value + '"]');
-      if (canonicalRadio) canonicalRadio.checked = true;
+
+  // Section 7's LED field mirror: same pattern -- write back onto the Section 1 canonical
+  // ledCount slider, then recalc() re-syncs both displays.
+  var _ledFixturesTotalEl = document.getElementById("ledFixturesTotal");
+  if (_ledFixturesTotalEl) {
+    _ledFixturesTotalEl.addEventListener("input", function () {
+      var canonicalSlider = document.getElementById("ledCount");
+      if (canonicalSlider) canonicalSlider.value = _ledFixturesTotalEl.value;
       recalc();
     });
-  });
+  }
 
   // Manual light/dark toggle. The CSS's :root[data-theme="dark"/"light"] blocks exist
   // specifically for this -- without this wiring they're unreachable and the page just
