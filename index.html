@@ -300,10 +300,7 @@
   <div class="theme-toggle-group">
     <span class="theme-toggle-label">Toggle Mode</span>
     <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme"><span id="theme-toggle-icon">🌙</span><span id="theme-toggle-text">Dark</span></button>
-  </div>
-  <div class="theme-toggle-group">
-    <span class="theme-toggle-label">Shared Inputs</span>
-    <button type="button" class="theme-toggle" id="reset-defaults" title="Reset all shared inputs to their default values for everyone viewing this page">Reset to Defaults</button>
+    <button type="button" class="theme-toggle" id="reset-defaults" title="Reset all shared inputs to their default values for everyone viewing this page">Reset to Default Values</button>
   </div>
   <div class="sticky-summary-item">
     <span class="sticky-label">Steady-State P/L</span>
@@ -374,7 +371,7 @@
     <div class="slider-row">
       <label>Mortgage payment holiday <span class="val" id="v-holidayMonths"></span></label>
       <input type="range" id="holidayMonths" min="0" max="12" step="1" value="11">
-      <div class="sub-readout"><span>months, 0–12</span><span>month 1 free, remainder accrues interest</span></div>
+      <div class="sub-readout"><span>months, 0–12</span><span>month 1 interest-free, remainder accrues interest</span></div>
     </div>
 
     <div class="slider-row">
@@ -465,9 +462,10 @@
     <div class="field-row"><label>Chart tail (steady-state months shown after ramp completes)</label>
       <input type="number" id="chartTailMonths" value="6" step="1"></div>
   </div>
-  <div class="flag">Defaults assume a winter/shoulder takeover, when supplemental lighting
-    contributes the most to yield. A peak-summer takeover relies more on natural light — lower
-    the early stages. Ref: ±$200K seasonality swing.</div>
+  <div class="flag">Defaults assume a winter/shoulder takeover, when yield depends on the LED
+    build-out rather than weak natural light. A summer takeover would see stronger natural light
+    early on, but that upside isn't credited here — kept conservative for underwriting. Ref:
+    ±$200K seasonality swing.</div>
 </section>
 
 <section class="panel">
