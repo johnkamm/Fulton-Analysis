@@ -107,8 +107,28 @@
     display: flex; justify-content: space-between;
     font-size: .76rem; color: var(--muted); margin-top: 2px;
   }
-  .slider-row .flag {
+  .flag {
     font-size: .72rem; color: var(--warn); margin-top: 2px;
+  }
+  .slider-row.grouped {
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+  }
+  .yield-curve-inputs {
+    display: flex; gap: 14px;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+  .yield-curve-field { flex: 1; }
+  .yield-curve-field label {
+    display: block; font-size: .72rem; color: var(--muted); margin-bottom: 3px; font-weight: 600;
+  }
+  .yield-curve-field input[type=number] {
+    width: 100%; padding: 5px 8px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font-size: .86rem; text-align: right; font-variant-numeric: tabular-nums;
   }
 
   /* Headline */
@@ -297,7 +317,7 @@
 <header>
   <h1>Indoor Sensitivity Analysis</h1>
   <p class="sub">Pure Coast Holdings — 12504 S 42nd St, Fulton Township / Vicksburg, MI. A
-    scenario/sensitivity exhibit supporting the Dart Bank term sheet — explore how LED
+    scenario/sensitivity exhibit supporting the Fulton Property Term Sheet — explore how LED
     build-out, sale price, and financing terms move the project's profitability.</p>
   <p class="scope">Indoor only — outdoor expansion (Tranche 3) is not modeled here.</p>
 </header>
@@ -308,14 +328,27 @@
     count, sale price, and financing terms to see how they move the P&amp;L.</p>
   <div class="sliders-grid">
 
-    <div class="slider-row">
+    <div class="slider-row grouped">
       <label># of LEDs added <span class="val" id="v-ledCount"></span></label>
       <input type="range" id="ledCount" min="0" max="440" step="5" value="220">
       <div class="sub-readout"><span>Total facility fixture count</span><span id="v-derivedGrowth"></span></div>
+      <div class="yield-curve-inputs">
+        <div class="yield-curve-field">
+          <label for="yieldAtZeroLeds">Yield @ 0 LEDs (g/sqft/cycle)</label>
+          <input type="number" id="yieldAtZeroLeds" value="15" step="1">
+        </div>
+        <div class="yield-curve-field">
+          <label for="yieldAtFullLeds">Yield @ 220 LEDs (g/sqft/cycle)</label>
+          <input type="number" id="yieldAtFullLeds" value="40" step="1">
+        </div>
+      </div>
+      <div class="flag">Yield is derived by interpolating between these two points as the LED
+        slider moves. Drag them down to stress-test how much profit depends on hitting the
+        upper end.</div>
     </div>
 
     <div class="slider-row">
-      <label>Sale price <span class="val" id="v-pricePerLb"></span></label>
+      <label>Premium Flower Sale Price <span class="val" id="v-pricePerLb"></span></label>
       <input type="range" id="pricePerLb" min="200" max="800" step="5" value="475.69">
       <div class="sub-readout"><span>$ / lb dry</span><span></span></div>
     </div>
@@ -347,9 +380,9 @@
 
 <section class="panel">
   <h2><span class="n">2</span>Buildout Financing (Fixed Structure)</h2>
-  <p class="hint">Per the Dart Bank term sheet, the buildout capital comes from two sources: the
-    HVAC/construction credit is funded directly by Dart Bank, and equipment + first-180-days
-    operating cash is financed by a private lender. There's no routing choice to make.</p>
+  <p class="hint">Buildout capital comes from two sources: (1) the HVAC/construction credit is
+    funded directly by Dart Bank, and (2) equipment + first-180-days operating cash is financed
+    by a private lender.</p>
   <div class="inputs-groups">
 
     <div class="inputs-group">
@@ -364,8 +397,7 @@
         <span class="field-note">One combined, fully-amortizing loan (rate/term set in Section 1
           and Additional Inputs → Financing Terms)</span></h3>
       <div class="field-row"><label>Non-LED buyer-furnished equipment ($)<span class="field-note">Trimmers
-        $12,500 + SteriMist $9,200 + washer $4,500 — matches the term sheet's buyer-furnished
-        equipment list</span></label>
+        $12,500 + SteriMist $9,200 + washer $4,500</span></label>
         <input type="number" id="nonLedBuyerEquip" value="26200" step="1000"></div>
       <div class="bd-row"><span class="k">LED equipment capex</span><span class="v" id="fs-ledCapex"></span></div>
       <div class="bd-row"><span class="k">OpEx financed</span><span class="v" id="fs-opexPrincipal"></span></div>
@@ -588,7 +620,7 @@
       <div class="field-row"><label>Mortgage term (yrs, balloon)</label><input type="number" id="mortgageTermYears" value="5" step="1"></div>
       <div class="field-row"><label>Mortgage amortization (yrs)</label><input type="number" id="mortgageAmortYears" value="10" step="1"></div>
       <div class="field-row"><label>Private Lender loan term (yrs)<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="privateLenderTermYears" value="2" step="1"></div>
-      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="4" step="1"></div>
+      <div class="field-row"><label>Months of OpEx financed<span class="field-note">estimate <span class="badge-placeholder">EST</span></span></label><input type="number" id="monthsOfOpexFinanced" value="6" step="1"></div>
     </div>
 
   </div>
@@ -596,7 +628,7 @@
 
 <footer>
   <p>Property price, mortgage terms, HVAC/construction-credit costs, and Base Indoor OpEx
-    figures are sourced from the Dart Bank term sheet. OpEx figures are annualized (×2) from
+    figures are sourced from the Fulton Property Term Sheet. OpEx figures are annualized (×2) from
     the term sheet's 180-day Buyer Contributions breakdown. Production yield, LED equipment
     cost, and financing-rate/term fields remain user-editable sensitivity inputs for scenario
     testing.</p>
@@ -626,6 +658,7 @@
   var fieldIds = [
     "cyclesPerYear", "commissionPct", "contingencyPct",
     "payroll", "nutrients", "overhead", "facilityUtilityOverhead", "otherOpex",
+    "yieldAtZeroLeds", "yieldAtFullLeds",
     "baySqFt", "hpsFixturesPerBay", "hpsWattsPerFixture", "ledWattsPerFixture",
     "ledCostPerFixture", "electricityRate", "suppHrsPerDay",
     "hvacChiller", "hvacDehumid", "hvacElectrical", "hvacDeferredMaint",
@@ -671,10 +704,11 @@
       s[id] = isPct ? raw / 100 : raw;
     });
 
-    // Yield is derived from the LED slider, not set independently: 0 LEDs -> 15 g/sqft/cycle,
-    // 220 LEDs (the term sheet's purchase count) -> 40 g/sqft/cycle, linear, not clamped above
-    // 220 so the slider can still explore buying more than the term sheet specifies.
-    s.improvedGrowth = 15 + (s.ledCount / 220) * (40 - 15);
+    // Yield is derived from the LED slider, not set independently: interpolated between the two
+    // editable curve endpoints (yieldAtZeroLeds / yieldAtFullLeds, Section 1) at 0 and 220 LEDs
+    // (220 = the term sheet's purchase count), linear, not clamped above 220 so the slider can
+    // still explore buying more than the term sheet specifies.
+    s.improvedGrowth = s.yieldAtZeroLeds + (s.ledCount / 220) * (s.yieldAtFullLeds - s.yieldAtZeroLeds);
 
     var _rampEl = document.getElementById("rampEnabled");
     s.rampEnabled      = _rampEl ? _rampEl.checked : false;
@@ -778,7 +812,7 @@
   function computeModel(s) {
     var core = computeCoreEconomics(s, s.improvedGrowth, 1, 1, true);
 
-    // Two-tier financing, matching the Dart Bank term sheet exactly:
+    // Two-tier financing, matching the Fulton Property Term Sheet exactly:
     //   Bank — the $1.8M property mortgage only. The HVAC/construction credit is funded
     //   directly by Dart Bank at closing and never folds into the mortgage principal.
     //   Private Lender — one combined, fully-amortizing loan covering LED equipment, non-LED
@@ -1111,7 +1145,7 @@
     // The balloon sits at month sim.balloonMonth (typically 60), off this short chart by
     // design -- surfaced as a callout instead of a plotted spike.
     el("balloon-annotation").textContent =
-      "⛳ Balloon " + usd0.format(sim.balloon1) + " due month " + sim.balloonMonth +
+      "Balloon " + usd0.format(sim.balloon1) + " due month " + sim.balloonMonth +
       ". Cumulative operating cash above excludes closing costs.";
 
     var tableRows = sim.rows.map(function (r) {
