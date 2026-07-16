@@ -123,12 +123,14 @@
   }
   .yield-curve-field { flex: 1; }
   .yield-curve-field label {
-    display: block; font-size: .72rem; color: var(--muted); margin-bottom: 3px; font-weight: 600;
+    display: block; font-size: .76rem; color: var(--muted); font-weight: 600;
   }
-  .yield-curve-field input[type=number] {
-    width: 100%; padding: 5px 8px; border-radius: 6px;
-    border: 1px solid var(--border); background: var(--bg); color: var(--text);
-    font-size: .86rem; text-align: right; font-variant-numeric: tabular-nums;
+  .yield-curve-field .yield-curve-value {
+    text-align: center; font-variant-numeric: tabular-nums; color: var(--accent);
+    font-weight: 700; font-size: .86rem; margin: 2px 0 4px;
+  }
+  .yield-curve-field input[type=range] {
+    width: 100%; accent-color: var(--accent); height: 18px;
   }
 
   /* Headline */
@@ -334,12 +336,14 @@
       <div class="sub-readout"><span>Total facility fixture count</span><span id="v-derivedGrowth"></span></div>
       <div class="yield-curve-inputs">
         <div class="yield-curve-field">
-          <label for="yieldAtZeroLeds">Yield @ 0 LEDs (g/sqft/cycle)</label>
-          <input type="number" id="yieldAtZeroLeds" value="15" step="1">
+          <label>Yield @ 0 LEDs</label>
+          <div class="yield-curve-value" id="v-yieldAtZeroLeds"></div>
+          <input type="range" id="yieldAtZeroLeds" min="0" max="20" step="1" value="15">
         </div>
         <div class="yield-curve-field">
-          <label for="yieldAtFullLeds">Yield @ 220 LEDs (g/sqft/cycle)</label>
-          <input type="number" id="yieldAtFullLeds" value="40" step="1">
+          <label>Yield @ 220 LEDs</label>
+          <div class="yield-curve-value" id="v-yieldAtFullLeds"></div>
+          <input type="range" id="yieldAtFullLeds" min="20" max="50" step="1" value="40">
         </div>
       </div>
       <div class="flag">Yield is derived by interpolating between these two points as the LED
@@ -653,12 +657,11 @@
     return -(pv * pow + pmt * (1 + rate * type) * (pow - 1) / rate);
   }
 
-  var sliderIds = ["pricePerLb", "mortgagePrice", "mortgageRate", "holidayMonths", "ledCount", "privateLenderRate"];
+  var sliderIds = ["pricePerLb", "mortgagePrice", "mortgageRate", "holidayMonths", "ledCount", "privateLenderRate", "yieldAtZeroLeds", "yieldAtFullLeds"];
   var pctSliderIds = { mortgageRate: 1, privateLenderRate: 1 };
   var fieldIds = [
     "cyclesPerYear", "commissionPct", "contingencyPct",
     "payroll", "nutrients", "overhead", "facilityUtilityOverhead", "otherOpex",
-    "yieldAtZeroLeds", "yieldAtFullLeds",
     "baySqFt", "hpsFixturesPerBay", "hpsWattsPerFixture", "ledWattsPerFixture",
     "ledCostPerFixture", "electricityRate", "suppHrsPerDay",
     "hvacChiller", "hvacDehumid", "hvacElectrical", "hvacDeferredMaint",
@@ -1179,6 +1182,8 @@
     // --- render ---
     set("v-ledCount", num0.format(s.ledCount));
     set("v-derivedGrowth", "→ " + num1.format(s.improvedGrowth) + " g/sqft/cycle");
+    set("v-yieldAtZeroLeds", num0.format(s.yieldAtZeroLeds) + " g/sqft");
+    set("v-yieldAtFullLeds", num0.format(s.yieldAtFullLeds) + " g/sqft");
     set("v-pricePerLb", usd2.format(s.pricePerLb) + "/lb");
     set("v-mortgagePrice", usd0.format(s.mortgagePrice));
     set("v-mortgageRate", pct(s.mortgageRate));
